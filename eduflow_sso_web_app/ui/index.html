@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MentorMind</title>
+  <link href="/ui/fonts.css" rel="stylesheet" />
+  <link href="/ui/app.css?v=3"   rel="stylesheet" />
+</head>
+<body>
+ 
+<div class="scanlines"></div>
+ 
+<main class="page">
+  <div class="layout">
+ 
+    <!-- ══ LEFT ══ -->
+    <div class="hero">
+ 
+      <div class="icon-wrap">
+        <svg class="record-svg" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="20" width="156" height="108" rx="12" ry="12" stroke="#2499ee" stroke-width="5" fill="none"/>
+          <rect x="24" y="32" width="132" height="84"  rx="6"  ry="6"  stroke="#2499ee" stroke-width="2.5" fill="none" opacity=".4"/>
+          <line x1="90" y1="128" x2="90"  y2="150" stroke="#2499ee" stroke-width="5" stroke-linecap="round"/>
+          <line x1="60" y1="150" x2="120" y2="150" stroke="#2499ee" stroke-width="5" stroke-linecap="round"/>
+          <!-- record circle — orange like the brackets -->
+          <circle cx="90" cy="74" r="26" stroke="#e87722" stroke-width="4" fill="none"/>
+          <circle cx="90" cy="74" r="10" fill="#e87722"/>
+          <circle cx="90" cy="74" r="36" stroke="#e87722" stroke-width="2" fill="none" opacity=".35" stroke-dasharray="6 4"/>
+          <path d="M148 20 Q162 8 168 20 Q174 34 162 40" stroke="#2499ee" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="162" cy="42" r="3" fill="#e87722"/>
+        </svg>
+      </div>
+ 
+      <div class="brand-wrap">
+        <div class="deco d1"></div><div class="deco d2"></div>
+        <div class="deco d3"></div><div class="deco d4"></div>
+        <div class="deco d5"></div><div class="deco d6"></div>
+        <div class="spark s1">✦</div><div class="spark s2">+</div>
+        <div class="spark s3">✳</div><div class="spark s4">+</div>
+        <div class="spark s5">✦</div><div class="spark s6">✳</div>
+        <span class="brand-top">Mentor</span>
+        <span class="brand-bottom">Mind</span>
+      </div>
+ 
+      <p class="tagline">Screen · Record · Learn · Grow</p>
+
+    </div>
+ 
+    <!-- ══ RIGHT ══ -->
+    <div class="upload-panel">
+ 
+      <div class="drop-zone" id="dropZone">
+        <svg class="drop-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6"  y="8"  width="68" height="46" rx="6" stroke="#2499ee" stroke-width="3.5" fill="none"/>
+          <rect x="13" y="15" width="54" height="32" rx="3" stroke="#2499ee" stroke-width="2"   fill="none" opacity=".35"/>
+          <line x1="40" y1="54" x2="40" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="26" y1="66" x2="54" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="40" y1="20" x2="40" y2="42" stroke="#e87722" stroke-width="3"   stroke-linecap="round"/>
+          <polyline points="30,33 40,44 50,33" stroke="#e87722" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <div class="drop-label">Drop Your Recording Here</div>
+        <div class="drop-sub">Drop here &middot; or click to upload &middot; MP4 / M4A</div>
+      </div>
+ 
+      <button class="upload-btn" id="uploadBtn">
+        <svg class="upload-btn-icon" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="20" width="156" height="108" rx="12" ry="12" stroke="#2499ee" stroke-width="8" fill="none"/>
+          <line x1="90" y1="128" x2="90"  y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
+          <line x1="60" y1="150" x2="120" y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="90" cy="74" r="26" stroke="#e87722" stroke-width="7" fill="none"/>
+          <circle cx="90" cy="74" r="11" fill="#e87722"/>
+        </svg>
+        <span id="uploadBtnLabel">Upload Recording</span>
+      </button>
+      <input type="file" id="fileInput" accept=".mp4,.m4a,video/mp4,audio/mp4,audio/x-m4a" style="display:none"/>
+
+      <!-- Upload feedback — hidden until an upload is in progress / done -->
+      <div class="upload-feedback" id="uploadFeedback" style="display:none">
+        <div class="upload-error"   id="uploadError"></div>
+        <div class="upload-progress-wrap" id="uploadProgressWrap" style="display:none">
+          <div class="upload-progress-bar" id="uploadProgressBar"></div>
+        </div>
+        <div class="upload-status"  id="uploadStatus"></div>
+      </div>
+ 
+    </div>
+  </div>
+</main>
+ 
+<footer>
+  <div class="footer-auth">
+    <button class="auth-btn" id="authBtn">Login</button>
+    <p class="auth-sub" id="authSub">Using <span class="cl-brand">Codeline</span> Account</p>
+  </div>
+  <p class="footer-copy">© 2026 MentorMind · <span id="sysStatus">All Systems Online</span></p>
+</footer>
+
+<script src="/ui/tus.min.js"></script>
+<script src="/ui/app.js?v=3"></script>
+ 
+</body>
+</html>

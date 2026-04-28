@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MentorMind · DB Monitor</title>
+  <link href="/ui/fonts.css" rel="stylesheet" />
+  <style>
+    /* ── Reset & base ────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #1a7abf;
+      --blue-bright: #2499ee;
+      --orange:      #e87722;
+      --orange-hot:  #ff9933;
+      --green:       #22c55e;
+      --green-dim:   #16a34a;
+      --red:         #f87171;
+      --red-dim:     #dc2626;
+      --bg:          #02060f;
+      --bg-card:     rgba(0, 10, 28, .75);
+      --border:      rgba(26, 122, 191, .25);
+      --text:        rgba(180, 210, 240, .9);
+      --text-dim:    rgba(100, 150, 190, .55);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Russo One', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: clamp(16px, 3vw, 40px);
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(26,122,191,.09) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(232,119,34,.06) 0%, transparent 55%),
+        var(--bg);
+    }
+
+    /* ── Scanlines overlay ───────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.06) 2px,
+        rgba(0,0,0,.06) 4px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout wrapper ──────────────────────────────────────────────── */
+    .page { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+
+    /* ── Header ──────────────────────────────────────────────────────── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      padding-bottom: clamp(16px, 2.5vw, 28px);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: clamp(20px, 3vw, 36px);
+    }
+
+    .header-left { display: flex; align-items: center; gap: 14px; }
+
+    .header-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(.95rem, 2.2vw, 1.35rem);
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--blue-bright);
+      text-shadow: 0 0 14px var(--blue-bright), 0 0 36px rgba(36,153,238,.4);
+    }
+
+    .header-logo span {
+      color: var(--orange);
+      text-shadow: 0 0 14px var(--orange), 0 0 36px rgba(232,119,34,.4);
+    }
+
+    .header-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(.54rem, 1.1vw, .68rem);
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--orange);
+      border: 1px solid rgba(232,119,34,.45);
+      padding: 3px 10px;
+      border-radius: 4px;
+      text-shadow: 0 0 8px var(--orange);
+      box-shadow: 0 0 8px rgba(232,119,34,.18);
+    }
+
+    .header-right {
+      display: flex; align-items: center; gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .admin-label {
+      font-size: clamp(.6rem, 1.1vw, .72rem);
+      letter-spacing: .12em;
+      color: var(--text-dim);
+    }
+    .admin-label strong {
+      color: var(--blue-bright);
+      text-shadow: 0 0 8px rgba(36,153,238,.5);
+      font-weight: 400;
+    }
+
+    .home-link {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(.58rem, 1vw, .68rem);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      border: 1px solid rgba(26,122,191,.3);
+      padding: 5px 14px;
+      border-radius: 6px;
+      transition: color .2s, border-color .2s, box-shadow .2s;
+    }
+    .home-link:hover {
+      color: var(--blue-bright);
+      border-color: var(--blue-bright);
+      box-shadow: 0 0 10px rgba(36,153,238,.25);
+    }
+
+    /* ── Stat cards ──────────────────────────────────────────────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(10px, 2vw, 20px);
+      margin-bottom: clamp(20px, 3vw, 36px);
+    }
+
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: clamp(14px, 2.5vw, 24px) clamp(16px, 2.5vw, 28px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0; border-radius: inherit;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26,122,191,.08) 0%, transparent 70%);
+    }
+
+    .stat-card.orange::before {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,119,34,.1) 0%, transparent 70%);
+    }
+    .stat-card.green::before {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34,197,94,.1) 0%, transparent 70%);
+    }
+    .stat-card.red::before {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(248,113,113,.1) 0%, transparent 70%);
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--blue-bright);
+      text-shadow: 0 0 18px var(--blue-bright), 0 0 40px rgba(36,153,238,.4);
+      margin-bottom: 8px;
+    }
+    .stat-card.orange .stat-value {
+      color: var(--orange);
+      text-shadow: 0 0 18px var(--orange), 0 0 40px rgba(232,119,34,.4);
+    }
+    .stat-card.green .stat-value {
+      color: var(--green);
+      text-shadow: 0 0 18px var(--green), 0 0 40px rgba(34,197,94,.4);
+    }
+    .stat-card.red .stat-value {
+      color: var(--red);
+      text-shadow: 0 0 18px var(--red), 0 0 40px rgba(248,113,113,.4);
+    }
+
+    .stat-label {
+      font-size: clamp(.58rem, 1.2vw, .72rem);
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ── Table toolbar ───────────────────────────────────────────────── */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .toolbar-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(.7rem, 1.5vw, .88rem);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--blue-bright);
+      text-shadow: 0 0 10px rgba(36,153,238,.4);
+    }
+
+    .refresh-info {
+      font-size: clamp(.54rem, 1vw, .65rem);
+      letter-spacing: .1em;
+      color: var(--text-dim);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .refresh-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: blink 1.4s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .25; }
+    }
+
+    /* ── Table wrapper ───────────────────────────────────────────────── */
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(26,122,191,.07), inset 0 0 30px rgba(0,8,30,.3);
+    }
+
+    .table-scroll { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(.6rem, 1.2vw, .78rem);
+    }
+
+    thead tr {
+      background: rgba(26,122,191,.1);
+      border-bottom: 1px solid rgba(36,153,238,.25);
+    }
+
+    th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(.52rem, 1vw, .65rem);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--blue-bright);
+      text-shadow: 0 0 8px rgba(36,153,238,.4);
+      padding: clamp(10px, 1.6vw, 16px) clamp(12px, 2vw, 20px);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(26,122,191,.1);
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(36,153,238,.05); }
+
+    td {
+      padding: clamp(10px, 1.5vw, 15px) clamp(12px, 2vw, 20px);
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .td-num {
+      color: var(--text-dim);
+      font-family: 'Orbitron', sans-serif;
+      font-size: .62rem;
+      letter-spacing: .1em;
+    }
+
+    .td-name {
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .td-email {
+      color: rgba(130,180,220,.7);
+      font-size: .72em;
+    }
+
+    .td-uuid {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .06em;
+      color: rgba(36,153,238,.65);
+      cursor: default;
+      white-space: nowrap;
+    }
+
+    .td-date {
+      white-space: nowrap;
+      font-size: .72em;
+      color: rgba(150,190,220,.7);
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .badge-pending {
+      color: var(--orange);
+      border: 1px solid rgba(232,119,34,.5);
+      text-shadow: 0 0 8px var(--orange);
+      box-shadow: 0 0 8px rgba(232,119,34,.15);
+      animation: pendingPulse 2s ease-in-out infinite;
+    }
+    @keyframes pendingPulse {
+      0%,100% { opacity: .85; box-shadow: 0 0 8px rgba(232,119,34,.15); }
+      50%      { opacity: 1;   box-shadow: 0 0 16px rgba(232,119,34,.35); }
+    }
+
+    .badge-processed {
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,.4);
+      text-shadow: 0 0 8px var(--green);
+      box-shadow: 0 0 8px rgba(34,197,94,.12);
+    }
+
+    .badge-failed {
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,.4);
+      text-shadow: 0 0 8px #f87171;
+      box-shadow: 0 0 8px rgba(248,113,113,.12);
+    }
+
+    .badge-inprogress {
+      color: #a78bfa;
+      border: 1px solid rgba(167,139,250,.4);
+      text-shadow: 0 0 8px #a78bfa;
+      box-shadow: 0 0 8px rgba(167,139,250,.12);
+      animation: pendingPulse 2s ease-in-out infinite;
+    }
+
+    /* ── Section divider ─────────────────────────────────────────────── */
+    .section-divider {
+      margin: clamp(28px, 4vw, 48px) 0 clamp(20px, 3vw, 36px);
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Empty / loading / error states ─────────────────────────────── */
+    .state-row td {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-dim);
+      font-size: .78rem;
+      letter-spacing: .12em;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 22px; height: 22px;
+      border: 2.5px solid rgba(36,153,238,.2);
+      border-top-color: var(--blue-bright);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg { color: var(--orange); }
+
+    .retry-btn {
+      background: none;
+      border: 1px solid rgba(232,119,34,.5);
+      color: var(--orange);
+      font-family: 'Orbitron', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: block;
+      margin-left: auto; margin-right: auto;
+      transition: box-shadow .2s;
+    }
+    .retry-btn:hover { box-shadow: 0 0 10px rgba(232,119,34,.35); }
+
+    /* ── Footer ──────────────────────────────────────────────────────── */
+    .footer {
+      margin-top: clamp(20px, 3vw, 36px);
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      font-size: clamp(.54rem, 1vw, .64rem);
+      letter-spacing: .1em;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo">Mentor<span>Mind</span></div>
+      <div class="header-badge">DB Monitor</div>
+    </div>
+    <div class="header-right">
+      <span class="admin-label">Signed in as <strong id="adminEmail">—</strong></span>
+      <a class="home-link" href="/">← Home</a>
+    </div>
+  </header>
+
+  <!-- ── Stat cards ── -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-label">Total Uploads</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-value" id="statPending">—</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-value" id="statProcessed">—</div>
+      <div class="stat-label">Processed</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-value" id="statFailed">—</div>
+      <div class="stat-label">Failed</div>
+    </div>
+  </div>
+
+  <!-- ── Table toolbar ── -->
+  <div class="toolbar">
+    <div class="toolbar-title">Upload Records</div>
+    <div class="refresh-info">
+      <span class="refresh-dot" id="refreshDot"></span>
+      <span id="refreshLabel">Loading…</span>
+    </div>
+  </div>
+
+  <!-- ── Uploads Table ── -->
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>File UUID</th>
+            <th>Uploaded At</th>
+            <th>Retries</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr class="state-row">
+            <td colspan="7"><span class="spinner"></span> Loading records…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- ── Transcription stat cards ── -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value" id="statTxTotal">—</div>
+      <div class="stat-label">Total Transcriptions</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-value" id="statTxPending">—</div>
+      <div class="stat-label">Pending Next Step</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-value" id="statTxProcessed">—</div>
+      <div class="stat-label">Processed</div>
+    </div>
+    <div class="stat-card" style="visibility:hidden"></div>
+  </div>
+
+  <!-- ── Transcriptions toolbar ── -->
+  <div class="toolbar">
+    <div class="toolbar-title">Transcription Records</div>
+  </div>
+
+  <!-- ── Transcriptions Table ── -->
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>File UUID</th>
+            <th>Transcribed At</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="txTableBody">
+          <tr class="state-row">
+            <td colspan="6"><span class="spinner"></span> Loading records…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <span>MentorMind · Admin Monitor</span>
+    <span id="genAt">—</span>
+  </footer>
+
+</div>
+
+<script src="/ui/monitor.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+services:
+  web:
+    image: codelineatyab/mentormindweb-app:latest
+    build: .
+    ports:
+      - "8090:8090"
+    env_file:
+      - .env
+    environment:
+      # Override the default relative paths with absolute Docker volume paths.
+      # These must match the volume mount targets defined below.
+      DATA_DIR: /data
+      UPLOADS_DIR: /app/uploads
+      TUS_UPLOADS_DIR: /tmp/tus_uploads
+      TRANSCRIPTIONS_DIR: /app/transcriptions
+    restart: always
+    volumes:
+      # SQLite database — persists across container recreation
+      - mentormind_data:/data
+      # Extracted audio files — persists across container recreation
+      - mentormind_uploads:/app/uploads
+      # Transcription .txt files — persists across container recreation
+      - mentormind_transcriptions:/app/transcriptions
+    # Healthcheck — Docker marks the container unhealthy if /auth/me stops responding
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8090/auth/me')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  # Named volume for the SQLite database file (/data/mentormind.db)
+  mentormind_data:
+  # Named volume for extracted .m4a audio files (/app/uploads/)
+  mentormind_uploads:
+  # Named volume for transcription .txt files (/app/transcriptions/)
+  mentormind_transcriptions:

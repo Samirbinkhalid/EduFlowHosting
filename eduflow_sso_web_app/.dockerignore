@@ -1,0 +1,24 @@
+# Secrets — never bake into the image
+.env
+.env.*
+!.env.example
+
+# Version control
+.git/
+.gitignore
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# uv — lock file must be present for --frozen builds
+# .venv is excluded; lock file is not
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Misc
+.python-version
