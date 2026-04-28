@@ -31,7 +31,7 @@ class Settings:
     # Comparison is case-insensitive.  Set ADMIN_EMAILS in the environment to
     # override (e.g. ADMIN_EMAILS=alice@example.com,bob@example.com).
     _admin_raw: str = os.getenv(
-        "ADMIN_EMAILS", "syed.atyab@codeline.rihal.om,ikhlas.khusaibi@codeline.rihal.om"
+        "ADMIN_EMAILS", "samirbinkhalid@gmail.com"
     )
     ADMIN_EMAILS: list = [e.strip().lower() for e in _admin_raw.split(",") if e.strip()]
 
@@ -74,7 +74,7 @@ class Settings:
     R2_ENDPOINT_URL: str = os.getenv("R2_ENDPOINT_URL", "")
     R2_ACCESS_KEY_ID: str = os.getenv("R2_ACCESS_KEY_ID", "")
     R2_SECRET_ACCESS_KEY: str = os.getenv("R2_SECRET_ACCESS_KEY", "")
-    R2_BUCKET_NAME: str = os.getenv("R2_BUCKET_NAME", "mentormindweb-audio-uploads")
+    R2_BUCKET_NAME: str = os.getenv("R2_BUCKET_NAME", "eduflow-transcriptions")
 
     # ── Remote PostgreSQL ──────────────────────────────────────────────────
     POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "")
