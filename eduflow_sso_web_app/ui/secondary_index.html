@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduFlow AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Outfit", "sans-serif"],
+            body: ['"Plus Jakarta Sans"', "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    @keyframes orbFloatA {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(48px, -42px, 0); }
+    }
+
+    @keyframes orbFloatB {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(-58px, 36px, 0); }
+    }
+
+    .orb-a {
+      animation: orbFloatA 18s ease-in-out infinite;
+      will-change: transform, opacity;
+      transform: translateZ(0);
+    }
+
+    .orb-b {
+      animation: orbFloatB 22s ease-in-out infinite;
+      will-change: transform, opacity;
+      transform: translateZ(0);
+    }
+
+    .dark .headline-top-glow {
+      text-shadow: 0 0 16px rgba(255, 255, 255, 0.16);
+    }
+
+    .dark .dark-glass-rim {
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 24px 60px rgba(76, 29, 149, 0.25);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 font-body text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+  <div class="pointer-events-none fixed inset-0 -z-20 bg-slate-50 dark:bg-slate-950"></div>
+
+  <div class="pointer-events-none fixed inset-0 -z-10 opacity-25 dark:opacity-20" style="background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+  <div class="pointer-events-none fixed -left-48 top-10 -z-10 h-[34rem] w-[34rem] rounded-full bg-violet-400/20 blur-3xl dark:bg-violet-600/25 orb-a"></div>
+  <div class="pointer-events-none fixed -right-52 bottom-4 -z-10 h-[36rem] w-[36rem] rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/22 orb-b"></div>
+  <div class="pointer-events-none fixed left-1/2 top-1/2 -z-10 h-[48rem] w-[48rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-700/15"></div>
+
+  <button id="themeToggle" class="fixed right-4 top-4 z-40 transform-gpu rounded-full border border-slate-300 bg-white/90 px-3 py-2 text-slate-700 transition-all duration-300 ease-out hover:scale-105 dark:border-slate-700 dark:bg-slate-800/85 dark:text-slate-100" aria-label="Toggle dark mode">
+    <i id="themeIcon" class="fa-solid fa-moon"></i>
+  </button>
+
+  <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-10 pt-24 sm:px-6 lg:flex-row lg:items-center lg:gap-16 lg:px-8">
+    <section class="w-full lg:w-1/2">
+      <div class="mb-8 flex items-center gap-3">
+        <svg viewBox="0 0 64 64" class="h-10 w-10" aria-hidden="true">
+          <path class="fill-violet-700 dark:fill-violet-500" d="M49 7C34 7 19 18 19 35c0 13 10 22 21 22 13 0 23-10 23-24 0-14-6-26-14-26Zm-2 45c-10 0-17-7-17-17 0-12 10-21 21-21 5 0 8 3 8 8 0 11-8 30-12 30Z"/>
+          <path class="fill-emerald-600 dark:fill-emerald-400" d="M29 17c-6 7-8 15-6 23 2 7 7 13 15 16 3-8 2-16-1-23-2-7-5-12-8-16Zm10 8c5 6 7 12 6 18-1 5-4 9-8 12-2-5-2-11 0-17 1-5 2-9 2-13Z"/>
+        </svg>
+        <span class="text-xl font-semibold tracking-wide text-slate-900 dark:text-slate-100">EduFlow AI</span>
+      </div>
+      <span class="font-display inline-flex items-center rounded-full border border-violet-300/60 bg-violet-100/80 px-4 py-2 text-xs font-medium tracking-tight text-violet-900 dark:border-violet-300/20 dark:bg-violet-500/10 dark:text-violet-200">
+        ✨ For students, by students.
+      </span>
+      <h1 class="font-display mt-6 leading-tight tracking-tight">
+        <span class="headline-top-glow block text-6xl font-extrabold text-slate-900 dark:text-white sm:text-7xl lg:text-7xl">
+          Turn Lectures
+        </span>
+        <span class="block pb-2 text-6xl font-extrabold leading-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-700 to-emerald-600 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] dark:from-violet-400 dark:to-emerald-400 dark:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)] sm:text-7xl lg:text-7xl">
+          into Learning.
+        </span>
+      </h1>
+      <p class="font-body mt-6 max-w-xl text-base leading-relaxed text-slate-700 dark:text-slate-300 sm:text-lg">
+        EduFlow AI is a fully Agentic AI platform built for teachers and students. It listens to lectures, understands them, maps them to a course outline, generates tasks, reviews code, fights plagiarism, and answers student questions — all autonomously and at scale.
+      </p>
+      <blockquote class="mt-6 max-w-xl border-l-4 border-violet-500 pl-4 italic leading-relaxed text-slate-800 shadow-[0_0_15px_rgba(139,92,246,0.5)] dark:text-slate-200">
+        "Built by Students. Powered by Agents. Loved by everyone"
+      </blockquote>
+    </section>
+
+    <section class="mt-12 w-full lg:mt-0 lg:w-1/2">
+      <div class="mx-auto w-full max-w-md">
+        <div id="authCard" class="dark-glass-rim rounded-2xl border border-white/10 bg-white/80 p-8 shadow-2xl backdrop-blur-2xl dark:bg-slate-900/50">
+          <div class="mb-6 grid grid-cols-2 rounded-full border border-slate-300 p-1 dark:border-slate-700">
+            <button type="button" id="teacherRoleBtn" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition">Teacher</button>
+            <button type="button" id="studentRoleBtn" class="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition dark:text-slate-200">Student</button>
+          </div>
+
+          <h2 id="authHeader" class="text-center text-2xl font-semibold text-slate-900 dark:text-white">Sign in to your account</h2>
+
+          <form id="loginForm" class="mt-6 space-y-4">
+            <input type="email" placeholder="Email address" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+            <input type="password" placeholder="Password" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+            <button type="submit" class="w-full rounded-lg bg-violet-600 px-4 py-2.5 font-semibold text-white transition hover:bg-violet-500">Sign In</button>
+          </form>
+
+          <form id="signupForm" class="mt-6 hidden space-y-4">
+            <div class="flex gap-3">
+              <input type="text" placeholder="First Name" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+              <input type="text" placeholder="Last Name" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+            </div>
+            <input type="email" placeholder="Email address" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+            <input type="password" placeholder="Password" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+            <input type="password" placeholder="Confirm password" class="w-full rounded-lg border border-slate-300 bg-transparent px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-violet-500 dark:border-slate-700 dark:text-slate-100" />
+            <button type="submit" class="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400">Create Account</button>
+          </form>
+
+          <div class="my-6 flex items-center gap-4">
+            <div class="h-px flex-1 border-t border-slate-300 dark:border-slate-700"></div>
+            <span class="text-xs font-medium tracking-wide text-slate-500 dark:text-slate-400">OR</span>
+            <div class="h-px flex-1 border-t border-slate-300 dark:border-slate-700"></div>
+          </div>
+
+          <button type="button" class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white/70 px-4 py-2.5 font-semibold text-slate-800 transition hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+            <i class="fa-brands fa-google"></i>
+            <span>Continue with Google</span>
+          </button>
+
+          <p class="mt-6 text-center text-sm text-slate-600 dark:text-slate-300">
+            <span id="authFooterLead">Don't have an account?</span>
+            <button id="authModeToggle" type="button" class="ml-1 font-semibold text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300">Sign up</button>
+          </p>
+          <div class="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
+            Selected role: <span id="activeRoleText" class="font-semibold text-slate-700 dark:text-slate-200">Teacher</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pb-4 text-center">
+    <p class="text-xs tracking-wide text-slate-500">© 2026 EduFlow AI · <span id="sysStatus">All Systems Online</span></p>
+  </footer>
+
+  <script>
+    const html = document.documentElement;
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const teacherRoleBtn = document.getElementById("teacherRoleBtn");
+    const studentRoleBtn = document.getElementById("studentRoleBtn");
+    const activeRoleText = document.getElementById("activeRoleText");
+    const authHeader = document.getElementById("authHeader");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const authModeToggle = document.getElementById("authModeToggle");
+    const authFooterLead = document.getElementById("authFooterLead");
+    let isSignup = false;
+
+    function setTheme(theme) {
+      html.classList.toggle("dark", theme === "dark");
+      themeIcon.className = theme === "dark" ? "fa-solid fa-sun text-yellow-400" : "fa-solid fa-moon";
+      localStorage.setItem("mentormind-theme", theme);
+    }
+
+    (function initTheme() {
+      const saved = localStorage.getItem("mentormind-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(saved || (prefersDark ? "dark" : "light"));
+    })();
+
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = html.classList.contains("dark") ? "light" : "dark";
+      setTheme(nextTheme);
+    });
+
+    function setRole(role) {
+      const isTeacher = role === "Teacher";
+      teacherRoleBtn.className = isTeacher
+        ? "rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition"
+        : "rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition dark:text-slate-200";
+      studentRoleBtn.className = !isTeacher
+        ? "rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition"
+        : "rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition dark:text-slate-200";
+      activeRoleText.textContent = role;
+    }
+
+    function setAuthMode(signupMode) {
+      isSignup = signupMode;
+      loginForm.classList.toggle("hidden", isSignup);
+      signupForm.classList.toggle("hidden", !isSignup);
+      authHeader.textContent = isSignup ? "Create an account" : "Sign in to your account";
+      authFooterLead.textContent = isSignup ? "Already have an account?" : "Don't have an account?";
+      authModeToggle.textContent = isSignup ? "Sign in" : "Sign up";
+    }
+
+    teacherRoleBtn.addEventListener("click", () => setRole("Teacher"));
+    studentRoleBtn.addEventListener("click", () => setRole("Student"));
+    authModeToggle.addEventListener("click", () => setAuthMode(!isSignup));
+
+    loginForm.addEventListener("submit", (event) => event.preventDefault());
+    signupForm.addEventListener("submit", (event) => event.preventDefault());
+
+    setRole("Teacher");
+    setAuthMode(false);
+  </script>
+</body>
+</html>

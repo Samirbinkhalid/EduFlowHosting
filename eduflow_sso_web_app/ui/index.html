@@ -1,103 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MentorMind</title>
-  <link href="/ui/fonts.css" rel="stylesheet" />
-  <link href="/ui/app.css?v=3"   rel="stylesheet" />
+  <title>EduFlow AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Outfit", "sans-serif"],
+            body: ['"Plus Jakarta Sans"', "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="/ui/app.css?v=3" rel="stylesheet" />
 </head>
-<body>
- 
-<div class="scanlines"></div>
- 
-<main class="page">
-  <div class="layout">
- 
-    <!-- ══ LEFT ══ -->
-    <div class="hero">
- 
-      <div class="icon-wrap">
-        <svg class="record-svg" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="12" y="20" width="156" height="108" rx="12" ry="12" stroke="#2499ee" stroke-width="5" fill="none"/>
-          <rect x="24" y="32" width="132" height="84"  rx="6"  ry="6"  stroke="#2499ee" stroke-width="2.5" fill="none" opacity=".4"/>
-          <line x1="90" y1="128" x2="90"  y2="150" stroke="#2499ee" stroke-width="5" stroke-linecap="round"/>
-          <line x1="60" y1="150" x2="120" y2="150" stroke="#2499ee" stroke-width="5" stroke-linecap="round"/>
-          <!-- record circle — orange like the brackets -->
-          <circle cx="90" cy="74" r="26" stroke="#e87722" stroke-width="4" fill="none"/>
-          <circle cx="90" cy="74" r="10" fill="#e87722"/>
-          <circle cx="90" cy="74" r="36" stroke="#e87722" stroke-width="2" fill="none" opacity=".35" stroke-dasharray="6 4"/>
-          <path d="M148 20 Q162 8 168 20 Q174 34 162 40" stroke="#2499ee" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <circle cx="162" cy="42" r="3" fill="#e87722"/>
-        </svg>
-      </div>
- 
-      <div class="brand-wrap">
-        <div class="deco d1"></div><div class="deco d2"></div>
-        <div class="deco d3"></div><div class="deco d4"></div>
-        <div class="deco d5"></div><div class="deco d6"></div>
-        <div class="spark s1">✦</div><div class="spark s2">+</div>
-        <div class="spark s3">✳</div><div class="spark s4">+</div>
-        <div class="spark s5">✦</div><div class="spark s6">✳</div>
-        <span class="brand-top">Mentor</span>
-        <span class="brand-bottom">Mind</span>
-      </div>
- 
-      <p class="tagline">Screen · Record · Learn · Grow</p>
+<body class="min-h-screen bg-slate-50 font-body text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+  <div class="pointer-events-none fixed inset-0 -z-20 bg-slate-50 dark:bg-slate-950"></div>
+  <div class="pointer-events-none fixed inset-0 -z-10 opacity-25 dark:opacity-20" style="background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 40px 40px;"></div>
+  <div class="pointer-events-none fixed -left-48 top-10 -z-10 h-[34rem] w-[34rem] rounded-full bg-violet-400/20 blur-3xl dark:bg-violet-600/25"></div>
+  <div class="pointer-events-none fixed -right-52 bottom-4 -z-10 h-[36rem] w-[36rem] rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/22"></div>
+  <div class="pointer-events-none fixed left-1/2 top-1/2 -z-10 h-[48rem] w-[48rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-700/15"></div>
 
-    </div>
- 
-    <!-- ══ RIGHT ══ -->
-    <div class="upload-panel">
- 
-      <div class="drop-zone" id="dropZone">
-        <svg class="drop-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="6"  y="8"  width="68" height="46" rx="6" stroke="#2499ee" stroke-width="3.5" fill="none"/>
-          <rect x="13" y="15" width="54" height="32" rx="3" stroke="#2499ee" stroke-width="2"   fill="none" opacity=".35"/>
-          <line x1="40" y1="54" x2="40" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="26" y1="66" x2="54" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="40" y1="20" x2="40" y2="42" stroke="#e87722" stroke-width="3"   stroke-linecap="round"/>
-          <polyline points="30,33 40,44 50,33" stroke="#e87722" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <div class="drop-label">Drop Your Recording Here</div>
-        <div class="drop-sub">Drop here &middot; or click to upload &middot; MP4 / M4A</div>
-      </div>
- 
-      <button class="upload-btn" id="uploadBtn">
-        <svg class="upload-btn-icon" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="12" y="20" width="156" height="108" rx="12" ry="12" stroke="#2499ee" stroke-width="8" fill="none"/>
-          <line x1="90" y1="128" x2="90"  y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
-          <line x1="60" y1="150" x2="120" y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
-          <circle cx="90" cy="74" r="26" stroke="#e87722" stroke-width="7" fill="none"/>
-          <circle cx="90" cy="74" r="11" fill="#e87722"/>
-        </svg>
-        <span id="uploadBtnLabel">Upload Recording</span>
+  <!-- Fixed top-right settings bar, vertical on sm, row on md+ -->
+  <div class="fixed top-4 right-4 z-50 flex flex-col md:flex-row gap-2 items-end md:items-center">
+    <button id="themeToggle" class="transform-gpu rounded-full border border-slate-300 bg-white/90 px-3 py-2 text-slate-700 transition-all duration-300 ease-out hover:scale-105 dark:border-slate-700 dark:bg-slate-800/85 dark:text-slate-100" aria-label="Toggle dark mode">
+      <i id="themeIcon" class="fa-solid fa-moon"></i>
+    </button>
+    <div id="authSettings" class="flex flex-col items-end md:flex-row md:items-center gap-2">
+      <button id="googleSSOBtn" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white/70 px-4 py-2.5 font-semibold text-slate-800 transition hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+        <span class="google-logo" aria-hidden="true" style="display:flex;align-items:center;margin-right:0.5em">
+  <svg width="18" height="18" viewBox="0 0 18 18">
+    <g>
+      <path d="M17.64 9.2045c0-.638-.0572-1.2523-.1636-1.837h-7.478v3.481h4.2746a3.65 3.65 0 01-1.595 2.394v1.975h2.584c1.5101-1.3913 2.378-3.4398 2.378-6.013z" fill="#4285F4"/>
+      <path d="M9.9984 17c2.1592 0 3.976-0.716 5.3017-1.951l-2.584-1.975c-0.718 0.482-1.636 0.770-2.7177 0.770-2.0887 0-3.8587-1.4107-4.4948-3.302l-2.6341 2.032c1.3316 2.634 4.149 4.426 7.1299 4.426z" fill="#34A853"/>
+      <path d="M5.5036 10.5427c-0.1593-0.482-0.2503-0.998-0.2503-1.542 0-0.544 0.09099-1.06 0.2503-1.542v-2.031h-2.6341A8.007 8.007 0 002 9c0 1.246 0.3003 2.428 0.8696 3.545l2.634-2.032z" fill="#FBBC05"/>
+      <path d="M9.9984 6.2054c1.1794 0 2.2368 0.4064 3.069-1.201l2.302-1.793C14.0267 2.355 12.1512 1.45 9.9984 1.45 7.0176 1.45 4.2002 3.241 2.8686 5.875l2.634 2.031C6.1397 7.6161 7.9097 6.2054 9.9984 6.2054z" fill="#EA4335"/>
+    </g>
+  </svg>
+</span>
+<span>Sign In</span>
       </button>
-      <input type="file" id="fileInput" accept=".mp4,.m4a,video/mp4,audio/mp4,audio/x-m4a" style="display:none"/>
-
-      <!-- Upload feedback — hidden until an upload is in progress / done -->
-      <div class="upload-feedback" id="uploadFeedback" style="display:none">
-        <div class="upload-error"   id="uploadError"></div>
-        <div class="upload-progress-wrap" id="uploadProgressWrap" style="display:none">
-          <div class="upload-progress-bar" id="uploadProgressBar"></div>
-        </div>
-        <div class="upload-status"  id="uploadStatus"></div>
+      <div id="welcomeMsg" class="hidden flex-col md:flex-row md:items-center gap-2">
+        <span class="font-bold">Welcome, <span id="teacherName">Teacher</span>!</span>
+        <button id="logoutBtn" class="mt-2 md:mt-0 rounded px-4 py-2 border font-semibold text-violet-700 border-violet-300 bg-violet-50 hover:bg-violet-100 dark:text-violet-200 dark:border-violet-500 dark:bg-slate-800 dark:hover:bg-slate-900">Logout</button>
       </div>
- 
     </div>
   </div>
-</main>
- 
-<footer>
-  <div class="footer-auth">
-    <button class="auth-btn" id="authBtn">Login</button>
-    <p class="auth-sub" id="authSub">Using <span class="cl-brand">Codeline</span> Account</p>
-  </div>
-  <p class="footer-copy">© 2026 MentorMind · <span id="sysStatus">All Systems Online</span></p>
-</footer>
 
-<script src="/ui/tus.min.js"></script>
-<script src="/ui/app.js?v=3"></script>
- 
+  <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-10 pt-16 sm:px-6 lg:flex-row lg:items-center lg:gap-16 lg:px-8">
+    <section class="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
+      <div class="mb-8 flex items-center gap-3">
+        <svg viewBox="0 0 64 64" class="h-10 w-10" aria-hidden="true">
+          <path class="fill-violet-700 dark:fill-violet-500" d="M49 7C34 7 19 18 19 35c0 13 10 22 21 22 13 0 23-10 23-24 0-14-6-26-14-26Zm-2 45c-10 0-17-7-17-17 0-12 10-21 21-21 5 0 8 3 8 8 0 11-8 30-12 30Z"/>
+          <path class="fill-emerald-600 dark:fill-emerald-400" d="M29 17c-6 7-8 15-6 23 2 7 7 13 15 16 3-8 2-16-1-23-2-7-5-12-8-16Zm10 8c5 6 7 12 6 18-1 5-4 9-8 12-2-5-2-11 0-17 1-5 2-9 2-13Z"/>
+        </svg>
+        <span class="text-xl font-semibold tracking-wide text-slate-900 dark:text-slate-100">EduFlow AI</span>
+      </div>
+      <span class="font-display inline-flex items-center rounded-full border border-violet-300/60 bg-violet-100/80 px-4 py-2 text-xs font-medium tracking-tight text-violet-900 dark:border-violet-300/20 dark:bg-violet-500/10 dark:text-violet-200">
+        ✨ The AI Agentic Learning Suite.
+      </span>
+      <h1 class="font-display mt-6 leading-tight tracking-tight">
+        <span class="headline-top-glow block text-5xl font-extrabold text-slate-900 dark:text-white sm:text-6xl lg:text-7xl">
+          Record & Upload Lectures
+        </span>
+        <span class="block pb-2 text-3xl font-extrabold leading-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-700 to-emerald-600 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] dark:from-violet-400 dark:to-emerald-400 dark:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)] sm:text-4xl lg:text-5xl">
+          for Effortless Grading & Feedback
+        </span>
+      </h1>
+      <p class="font-body mt-6 max-w-xl text-base leading-relaxed text-slate-700 dark:text-slate-300 sm:text-lg">
+        EduFlow AI brings teacher-centric tools to the forefront—analyze, annotate, and automate assessments for any recorded lesson or seminar. Secure SSO-integrated uploads support a seamless, modern workflow.
+      </p>
+      <blockquote class="mt-6 max-w-xl border-l-4 border-violet-500 pl-4 italic leading-relaxed text-slate-800 shadow-[0_0_15px_rgba(139,92,246,0.5)] dark:text-slate-200">
+        "Built for educators. Crafted for scale."
+      </blockquote>
+    </section>
+    <section class="w-full lg:w-1/2 mt-16 lg:mt-0 flex justify-center lg:justify-end">
+      <div class="upload-panel max-w-md w-full">
+        <div class="drop-zone" id="dropZone">
+          <svg class="drop-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6"  y="8"  width="68" height="46" rx="6" stroke="#2499ee" stroke-width="3.5" fill="none"/>
+            <rect x="13" y="15" width="54" height="32" rx="3" stroke="#2499ee" stroke-width="2"   fill="none" opacity=".35"/>
+            <line x1="40" y1="54" x2="40" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="26" y1="66" x2="54" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="40" y1="20" x2="40" y2="42" stroke="#e87722" stroke-width="3"   stroke-linecap="round"/>
+            <polyline points="30,33 40,44 50,33" stroke="#e87722" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <div class="drop-label">Drop Your Recording Here</div>
+          <div class="drop-sub">Drop here &middot; or click to upload &middot; MP4 / M4A</div>
+        </div>
+        <button class="upload-btn" id="uploadBtn">
+          <svg class="upload-btn-icon" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="20" width="156" height="108" rx="12" ry="12" stroke="#2499ee" stroke-width="8" fill="none"/>
+            <line x1="90" y1="128" x2="90"  y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
+            <line x1="60" y1="150" x2="120" y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="90" cy="74" r="26" stroke="#e87722" stroke-width="7" fill="none"/>
+            <circle cx="90" cy="74" r="11" fill="#e87722"/>
+          </svg>
+          <span id="uploadBtnLabel">Upload Recording</span>
+        </button>
+        <input type="file" id="fileInput" accept=".mp4,.m4a,video/mp4,audio/mp4,audio/x-m4a" style="display:none"/>
+        <div class="upload-feedback" id="uploadFeedback" style="display:none">
+          <div class="upload-error"   id="uploadError"></div>
+          <div class="upload-progress-wrap" id="uploadProgressWrap" style="display:none">
+            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+          </div>
+          <div class="upload-status"  id="uploadStatus"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="pb-4 text-center">
+    <p class="text-xs tracking-wide text-slate-500">© 2026 EduFlow AI · <span id="sysStatus">All Systems Online</span></p>
+  </footer>
+  <script src="/ui/tus.min.js"></script>
+  <script src="/ui/app.js?v=3"></script>
+  <script>
+    // Theme toggle logic
+    const html = document.documentElement;
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    function setTheme(theme) {
+      html.classList.toggle("dark", theme === "dark");
+      themeIcon.className = theme === "dark" ? "fa-solid fa-sun text-yellow-400" : "fa-solid fa-moon";
+      localStorage.setItem("eduflow-theme", theme);
+    }
+    (function initTheme() {
+      const saved = localStorage.getItem("eduflow-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(saved || (prefersDark ? "dark" : "light"));
+    })();
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = html.classList.contains("dark") ? "light" : "dark";
+      setTheme(nextTheme);
+    });
+
+    // Auth logic swapout: Only Google SSO in settings bar
+    const googleSSOBtn = document.getElementById('googleSSOBtn');
+    const welcomeMsg = document.getElementById('welcomeMsg');
+    const teacherName = document.getElementById('teacherName');
+    const logoutBtn = document.getElementById('logoutBtn');
+    async function checkAuth() {
+      try {
+        const meRes  = await fetch('/auth/me', { cache: 'no-store' });
+        const meData = await meRes.json();
+        if (!meData.authenticated) {
+          welcomeMsg.classList.add('hidden');
+          googleSSOBtn.classList.remove('hidden');
+          return;
+        }
+        // Authenticated
+        googleSSOBtn.classList.add('hidden');
+        welcomeMsg.classList.remove('hidden');
+        teacherName.textContent = meData.user && meData.user.name ? meData.user.name : 'Teacher';
+      } catch {
+        welcomeMsg.classList.add('hidden');
+        googleSSOBtn.classList.remove('hidden');
+      }
+    }
+    googleSSOBtn.addEventListener('click', () => {
+      window.location.href = '/auth/login?method=google';
+    });
+    logoutBtn.addEventListener('click', () => {
+      window.location.href = '/auth/logout';
+    });
+    // Check on page load
+    checkAuth();
+  </script>
 </body>
 </html>
