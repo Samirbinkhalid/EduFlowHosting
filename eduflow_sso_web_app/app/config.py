@@ -5,11 +5,9 @@ load_dotenv()
 
 
 class Settings:
-    # Azure AD / Microsoft Entra ID
-    AZURE_CLIENT_ID: str = os.environ["AZURE_CLIENT_ID"]
-    AZURE_CLIENT_SECRET: str = os.environ["AZURE_CLIENT_SECRET"]
-    # Use "common" for multi-tenant, or your specific Tenant ID for single-tenant
-    AZURE_TENANT_ID: str = os.getenv("AZURE_TENANT_ID", "common")
+    # Google OAuth / OIDC
+    GOOGLE_CLIENT_ID: str = os.environ["GOOGLE_CLIENT_ID"]
+    GOOGLE_CLIENT_SECRET: str = os.environ["GOOGLE_CLIENT_SECRET"]
 
     # App
     APP_BASE_URL: str = os.getenv(
@@ -93,16 +91,16 @@ class Settings:
         return f"{self.APP_BASE_URL}/auth"
 
     @property
-    def microsoft_authorize_url(self) -> str:
-        return f"https://login.microsoftonline.com/{self.AZURE_TENANT_ID}/oauth2/v2.0/authorize"
+    def google_authorize_url(self) -> str:
+        return "https://accounts.google.com/o/oauth2/v2/auth"
 
     @property
-    def microsoft_token_url(self) -> str:
-        return f"https://login.microsoftonline.com/{self.AZURE_TENANT_ID}/oauth2/v2.0/token"
+    def google_token_url(self) -> str:
+        return "https://oauth2.googleapis.com/token"
 
     @property
-    def microsoft_jwks_url(self) -> str:
-        return f"https://login.microsoftonline.com/{self.AZURE_TENANT_ID}/discovery/v2.0/keys"
+    def google_jwks_url(self) -> str:
+        return "https://www.googleapis.com/oauth2/v3/certs"
 
 
 settings = Settings()

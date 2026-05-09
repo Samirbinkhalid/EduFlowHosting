@@ -11,23 +11,23 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.get("/login")
 async def login(request: Request):
     """
-    Redirect the browser to Microsoft's login page.
+    Redirect the browser to Google's login page.
     authlib stores a one-time 'state' nonce in the session automatically
     to protect against CSRF.
     """
     redirect_uri = settings.redirect_uri
-    return await oauth.microsoft.authorize_redirect(request, redirect_uri)
+    return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/")
 async def auth_callback(request: Request):
     """
-    Microsoft redirects here after the user authenticates.
+    Google redirects here after the user authenticates.
     authlib validates the state, exchanges the code for tokens,
     and verifies the ID token signature & claims automatically.
     """
     try:
-        token = await oauth.microsoft.authorize_access_token(request)
+        token = await oauth.google.authorize_access_token(request)
     except OAuthError as exc:
         # Could be a CSRF mismatch, user cancellation, or misconfiguration
         return RedirectResponse(
@@ -39,12 +39,11 @@ async def auth_callback(request: Request):
 
     # Persist only what you need in the encrypted, signed cookie session
     request.session["user"] = {
-        "sub": user_info.get("sub"),           # unique Microsoft object ID
-        "email": user_info.get("email") or user_info.get("preferred_username"),
+        "sub": user_info.get("sub"),           # unique Google subject ID
+        "email": user_info.get("email"),
         "name": user_info.get("name"),
         "given_name": user_info.get("given_name"),
         "family_name": user_info.get("family_name"),
-        "tid": user_info.get("tid"),           # Azure tenant ID, useful for multi-tenant
     }
 
     return RedirectResponse(url=settings.POST_LOGIN_REDIRECT)
@@ -53,18 +52,12 @@ async def auth_callback(request: Request):
 @router.get("/logout")
 async def logout(request: Request):
     """
-    Clear the local session and redirect to Microsoft's logout endpoint
-    so the SSO session is also terminated.
+    Clear the local session and redirect to the post-logout page.
+    Google does not provide a front-channel SSO logout endpoint,
+    so only the local session is cleared.
     """
     request.session.clear()
-
-    # Microsoft's front-channel logout URL
-    ms_logout_url = (
-        f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
-        f"/oauth2/v2.0/logout"
-        f"?post_logout_redirect_uri={settings.APP_BASE_URL}{settings.POST_LOGOUT_REDIRECT}"
-    )
-    return RedirectResponse(url=ms_logout_url)
+    return RedirectResponse(url=settings.POST_LOGOUT_REDIRECT)
 
 
 @router.get("/me")

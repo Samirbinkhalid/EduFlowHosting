@@ -52,7 +52,7 @@ async def get_authorized_user(request: Request) -> dict:
     """FastAPI dependency — two-factor authorisation gate.
 
     Step 1 — SSO session check (via get_current_user):
-        Raises 401 if the user has no active Microsoft SSO session.
+        Raises 401 if the user has no active Google SSO session.
 
     Step 2 — Activation webhook check (USERS_URL):
         Calls GET <USERS_URL>?email=<email> to verify the user is activated

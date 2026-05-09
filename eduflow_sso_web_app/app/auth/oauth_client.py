@@ -4,18 +4,14 @@ from app.config import settings
 oauth = OAuth()
 
 oauth.register(
-    name="microsoft",
-    client_id=settings.AZURE_CLIENT_ID,
-    client_secret=settings.AZURE_CLIENT_SECRET,
-    server_metadata_url=(
-        f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
-        "/v2.0/.well-known/openid-configuration"
-    ),
+    name="google",
+    client_id=settings.GOOGLE_CLIENT_ID,
+    client_secret=settings.GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={
-        # openid  → ID token; email/profile → basic claims; offline_access → refresh token
-        "scope": "openid email profile offline_access",
+        # openid → ID token; email/profile → basic claims
+        "scope": "openid email profile",
         "response_type": "code",
-        # Validate ID token claims automatically
         "token_endpoint_auth_method": "client_secret_post",
     },
 )
