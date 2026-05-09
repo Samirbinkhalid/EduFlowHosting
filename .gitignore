@@ -1,0 +1,74 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+*.egg-info/
+*.eggs/
+*.dist-info/
+*.egg
+pip-wheel-metadata/
+.Python
+.pytest_cache/
+.pytype/
+*.cover
+.coverage*
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+.cache/
+nosetests.xml
+coverage.xml
+
+# uv-specific
+.venv/
+uv.lock
+
+# Environment & secrets
+.env
+.env.*
+.venv/
+secrets.*
+*.env
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# n8n Hosting (Docker + Custom Data)
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.local.yml
+.docker/
+Dockerfile*
+/data/
+n8n-data/
+n8n-volume/
+backup/
+*.backup
+
+# n8n custom config and envs
+config/
+local_files/
+logs/
+*.sqlite
+
+# npm (if using for n8n custom modules)
+/node_modules/
+package-lock.json
+yarn.lock
+
+# Misc
+*.log
+*.tmp
+*.swp
+*~

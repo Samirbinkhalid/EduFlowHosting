@@ -45,6 +45,7 @@ services:
       - N8N_HOST
       - N8N_EDITOR_BASE_URL
       - WEBHOOK_URL
+      - N8N_PROXY_HOPS
     ports:
       - 5678:5678
     links:
