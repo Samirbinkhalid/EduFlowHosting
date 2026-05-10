@@ -1,6 +1,5 @@
 services:
   web:
-    image: codelineatyab/mentormindweb-app:latest
     build: .
     ports:
       - "8090:8090"
