@@ -55,26 +55,24 @@ codeline_sso_web_app/
 ## Authentication Flow
 
 1. User visits the landing page (`/`). If not logged in, they see a welcome prompt with a link to `/auth/login`.
-2. `GET /auth/login` — FastAPI redirects browser to Microsoft's OAuth2 authorize endpoint. `authlib` automatically writes a CSCSRF `state` nonce into the session cookie.
-3. Microsoft authenticates the user and redirects back to `GET /auth` (the registered redirect URI: `{APP_BASE_URL}/auth`).
+2. `GET /auth/login` — FastAPI redirects browser to Google's OAuth2 authorize endpoint. `authlib` automatically writes a CSRF `state` nonce into the session cookie.
+3. Google authenticates the user and redirects back to `GET /auth` (the registered redirect URI: `{APP_BASE_URL}/auth`).
 4. `authlib` validates `state`, exchanges the authorization code for tokens, and verifies the ID token signature.
 5. The following claims are written into the session cookie:
-   - `sub` — unique Microsoft object ID
-   - `email` / `preferred_username`
+   - `sub` — unique Google subject ID
+   - `email`
    - `name`, `given_name`, `family_name`
-   - `tid` — Azure tenant ID
 6. User is redirected to `POST_LOGIN_REDIRECT` (default `/`).
 7. The home page (`/`) and all protected routes read `request.session["user"]`.
-8. `GET /auth/logout` clears the local session and redirects to Microsoft's front-channel logout URL.
+8. `GET /auth/logout` clears the local session and redirects to `POST_LOGOUT_REDIRECT`.
 
 ### Key Config Properties (`app/config.py`)
 
 | Property                  | Description                                              |
 |---------------------------|----------------------------------------------------------|
-| `AZURE_CLIENT_ID`         | Azure App Registration client ID                        |
-| `AZURE_CLIENT_SECRET`     | Azure App Registration client secret                    |
-| `AZURE_TENANT_ID`         | Tenant ID (`"common"` for multi-tenant)                 |
-| `APP_BASE_URL`            | Public URL; must match Azure redirect URI exactly       |
+| `GOOGLE_CLIENT_ID`        | Google Cloud OAuth 2.0 client ID                        |
+| `GOOGLE_CLIENT_SECRET`    | Google Cloud OAuth 2.0 client secret                    |
+| `APP_BASE_URL`            | Public URL; must match Google authorised redirect URI   |
 | `SESSION_SECRET_KEY`      | Signs/encrypts the session cookie                       |
 | `POST_LOGIN_REDIRECT`     | Where to land after successful login (default `/`)      |
 | `POST_LOGOUT_REDIRECT`    | Where to land after logout (default `/`)                |
@@ -151,9 +149,9 @@ Implementation details (e.g. an allowlist table, Azure group membership, etc.) a
 |--------|---------------------|---------------|------------------------------------------|
 | `GET`  | `/`                 | No            | Root; returns greeting or user info      |
 | `GET`  | `/protected`        | Yes           | Example protected endpoint               |
-| `GET`  | `/auth/login`       | No            | Initiates Azure OAuth2 redirect          |
+| `GET`  | `/auth/login`       | No            | Initiates Google OAuth2 redirect         |
 | `GET`  | `/auth/`            | No            | OAuth2 callback; sets session            |
-| `GET`  | `/auth/logout`      | No            | Clears session; redirects to MS logout   |
+| `GET`  | `/auth/logout`      | No            | Clears session; redirects to logout page |
 | `GET`  | `/auth/me`          | No            | Returns `{authenticated, user}` from session |
 | `POST` | `/upload/`          | Yes (TBD)     | TUS upload creation endpoint             |
 | `PATCH`| `/upload/{id}`      | Yes (TBD)     | TUS upload continuation endpoint         |
@@ -167,10 +165,9 @@ Implementation details (e.g. an allowlist table, Azure group membership, etc.) a
 Copy `.env.example` to `.env` and populate:
 
 ```dotenv
-# Azure AD
-AZURE_CLIENT_ID=
-AZURE_CLIENT_SECRET=
-AZURE_TENANT_ID=
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 
 # App
 APP_BASE_URL=https://mentormindweb.thedevrelay.com
