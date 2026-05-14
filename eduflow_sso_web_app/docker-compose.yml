@@ -15,11 +15,11 @@ services:
     restart: always
     volumes:
       # SQLite database — persists across container recreation
-      - mentormind_data:/data
+      - eduflow_data:/data
       # Extracted audio files — persists across container recreation
-      - mentormind_uploads:/app/uploads
+      - eduflow_uploads:/app/uploads
       # Transcription .txt files — persists across container recreation
-      - mentormind_transcriptions:/app/transcriptions
+      - eduflow_transcriptions:/app/transcriptions
     # Healthcheck — Docker marks the container unhealthy if /auth/me stops responding
     healthcheck:
       test: ["CMD", "python", "-c",
@@ -30,9 +30,9 @@ services:
       start_period: 10s
 
 volumes:
-  # Named volume for the SQLite database file (/data/mentormind.db)
-  mentormind_data:
+  # Named volume for the SQLite database file (/data/eduflow.db)
+  eduflow_data:
   # Named volume for extracted .m4a audio files (/app/uploads/)
-  mentormind_uploads:
+  eduflow_uploads:
   # Named volume for transcription .txt files (/app/transcriptions/)
-  mentormind_transcriptions:
+  eduflow_transcriptions:

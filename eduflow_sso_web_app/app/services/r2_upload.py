@@ -13,7 +13,7 @@ Usage
 
 Object layout
 -------------
-    Bucket : settings.R2_BUCKET_NAME  (mentormindweb-audio-uploads)
+    Bucket : settings.R2_BUCKET_NAME  (eduflowweb-audio-uploads)
     Key    : {uuid}.txt               (flat, no prefix)
     Tags   : user_name, user_email, created_at (ISO 8601 UTC)
 """

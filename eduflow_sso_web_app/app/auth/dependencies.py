@@ -86,7 +86,7 @@ async def get_authorized_user(request: Request) -> dict:
         if perm_res.status_code == 404:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Account not activated. Please ask Codeline to activate your account.",
+                detail="Account not activated. Please contact EduFlow Team to activate your account.",
             )
 
         # Any other non-200 (5xx, etc.)

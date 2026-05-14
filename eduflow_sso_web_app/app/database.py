@@ -52,7 +52,7 @@ def _db_path() -> str:
     """Return the absolute path to the SQLite database file."""
     data_dir = Path(settings.DATA_DIR).resolve()
     data_dir.mkdir(parents=True, exist_ok=True)
-    return str(data_dir / "mentormind.db")
+    return str(data_dir / "eduflow.db")
 
 
 # ── Schema init (async, called once at app startup) ───────────────────────────

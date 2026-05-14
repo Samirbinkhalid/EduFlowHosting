@@ -171,11 +171,11 @@
     function setTheme(theme) {
       html.classList.toggle("dark", theme === "dark");
       themeIcon.className = theme === "dark" ? "fa-solid fa-sun text-yellow-400" : "fa-solid fa-moon";
-      localStorage.setItem("mentormind-theme", theme);
+      localStorage.setItem("eduflow-theme", theme);
     }
 
     (function initTheme() {
-      const saved = localStorage.getItem("mentormind-theme");
+      const saved = localStorage.getItem("eduflow-theme");
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setTheme(saved || (prefersDark ? "dark" : "light"));
     })();

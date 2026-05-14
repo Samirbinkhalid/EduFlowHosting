@@ -29,7 +29,7 @@ class Settings:
     # Comparison is case-insensitive.  Set ADMIN_EMAILS in the environment to
     # override (e.g. ADMIN_EMAILS=alice@example.com,bob@example.com).
     _admin_raw: str = os.getenv(
-        "ADMIN_EMAILS", "samirbinkhalid@gmail.com"
+        "ADMIN_EMAILS", "bsai24108292@szabist.pk"
     )
     ADMIN_EMAILS: list = [e.strip().lower() for e in _admin_raw.split(",") if e.strip()]
 
@@ -37,7 +37,7 @@ class Settings:
     # Called as GET <USERS_URL>?email=<email>  →  200 = allowed, 404 = not activated.
     USERS_URL: str = os.getenv(
         "USERS_URL",
-        "https://echoautomation.theworkpc.com/webhook/mentormindusers",
+        "https://eduflown8n.thedevrelay.com/webhook/eduflowusers",
     )
 
     # ── Storage paths ──────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ class Settings:
     # In Docker these are overridden to absolute volume-mount paths via
     # environment variables set in docker-compose.yml.
 
-    # Directory that holds the SQLite database file (mentormind.db)
+    # Directory that holds the SQLite database file (eduflow.db)
     DATA_DIR: str = os.getenv("DATA_DIR", "./data")
 
     # Directory where extracted .m4a audio files are stored persistently

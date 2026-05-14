@@ -1,5 +1,5 @@
 /* ============================================================
-   MentorMind — ui/monitor.js  (v2)
+   EduFlow — ui/monitor.js  (v2)
    Fetches /dbstatus/data and renders:
      • Uploads table   (with Failed stat card)
      • Transcriptions table

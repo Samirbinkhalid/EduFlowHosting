@@ -1,5 +1,5 @@
 /* ============================================================
-   MentorMind — ui/app.js
+   EduFlow — ui/app.js
    Handles:
      1. Drop-zone / file-input interactions with auth guard,
         file type & size validation, and TUS resumable upload
@@ -12,8 +12,8 @@
 // ------------------------------------------------------------------ //
 // Constants                                                           //
 // ------------------------------------------------------------------ //
-const HEALTH_URL     = 'https://echoautomation.theworkpc.com/webhook/isactive';
-const USERS_URL      = 'https://echoautomation.theworkpc.com/webhook/mentormindusers';
+const HEALTH_URL     = 'https://eduflown8n.thedevrelay.com/webhook/isactive';
+const USERS_URL      = 'https://eduflown8n.thedevrelay.com/webhook/eduflowusers';
 const CHECK_INTERVAL = 15_000;   // health-check poll every 15 s
 const FETCH_TIMEOUT  = 10_000;   // treat any request as failed after 10 s
 
@@ -177,7 +177,7 @@ async function checkAuthorized() {
     if (permRes.ok) return true;   // 200 → authorised
 
     if (permRes.status === 404) {
-      showError('Account not activated. Please ask Codeline to activate your account.');
+      showError('Account not activated. Please contact EduFlow Team to activate your account.');
       return false;
     }
 
@@ -209,6 +209,9 @@ function validateFile(f) {
       (f.size / (1024 * 1024)).toFixed(1) + ' MB).');
     return false;
   }
+  console.log('[upload] File validated:', f.name,
+    '|', (f.size / (1024 * 1024)).toFixed(2) + ' MB',
+    '| type:', f.type || 'unknown');
   return true;
 }
 
@@ -241,6 +244,10 @@ function startUpload(f) {
       const pct = bytesTotal > 0
         ? Math.round((bytesSent / bytesTotal) * 100)
         : 0;
+      const chunkMB = ((bytesSent - (upload._offset || 0)) / (1024 * 1024)).toFixed(2);
+      console.log('[upload] Progress:', pct + '%',
+        '| sent:', (bytesSent / (1024 * 1024)).toFixed(2) + ' MB',
+        '/ total:', (bytesTotal / (1024 * 1024)).toFixed(2) + ' MB');
       showProgress(
         pct,
         'Uploading\u2026 ' + pct + '% ' +
@@ -260,7 +267,7 @@ function startUpload(f) {
         return;
       }
       if (httpStatus === 403) {
-        showError('Account not activated. Please ask Codeline to activate your account.');
+        showError('Account not activated. Please contact EduFlow Team to activate your account.');
         return;
       }
       if (httpStatus === 413) {
@@ -274,6 +281,8 @@ function startUpload(f) {
       activeUpload = null;
       setButtonIdle();
       resetZone();
+      console.log('[upload] Upload complete:', f.name,
+        '|', (f.size / (1024 * 1024)).toFixed(2) + ' MB');
       showSuccess('Upload complete \u2014 your file is being processed.');
     },
   });

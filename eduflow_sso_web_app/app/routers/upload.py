@@ -35,6 +35,7 @@ Post-completion hook (triggered in the final PATCH)
 
 import json
 import base64
+import logging
 import shutil
 import uuid as _uuid
 from pathlib import Path
@@ -145,6 +146,12 @@ async def tus_create(
             detail="Upload-Length must be an integer.",
         )
 
+    logging.getLogger(__name__).info(
+        "New upload created: total_size=%d bytes (%.2f MB)",
+        total_size,
+        total_size / (1024 * 1024),
+    )
+    
     if total_size > MAX_SIZE_BYTES:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,

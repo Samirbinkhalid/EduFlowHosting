@@ -1,5 +1,5 @@
 [project]
-name = "codeline-sso-web-app"
+name = "eduflow-sso-web-app"
 version = "0.1.0"
 description = "FastAPI Microsoft SSO (OAuth 2.0 / OIDC) application"
 requires-python = ">=3.12"
