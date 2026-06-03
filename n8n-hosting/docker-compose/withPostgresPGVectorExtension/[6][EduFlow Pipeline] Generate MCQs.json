@@ -1,0 +1,634 @@
+{
+  "name": "[6][EduFlow Pipeline] Generate MCQs",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Process the MCQ's questions (Duplicate process meeting summery workflow)",
+        "height": 496,
+        "width": 1952
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "f84de973-4da2-44b6-a7dc-b332cb219398",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -64
+      ],
+      "id": "ff96e9ee-1674-4738-916c-d1b177d1bcc1",
+      "name": "On User Story Creation1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -320,
+        144
+      ],
+      "id": "918a15ed-d2b1-49f5-a747-591aa9e7044b",
+      "name": "Schedule Trigger6"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "mcqs-bucket",
+        "fileName": "=mcqs_questions_{{$('Fetch User Story Data 3').item.json.title}}.md\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -64
+      ],
+      "id": "03220d51-0940-4f74-b2bf-5f0275d57cf3",
+      "name": "Upload MCQs to S3",
+      "credentials": {
+        "s3": {
+          "id": "k1ntcpwn5V9YQ7hV",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "message": "=Successfully created MCQ's for \"{{ $('Fetch User Story Data 3').item.json.title }}\"\non {{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "for_user_email": "={{ $('Fetch User Story Data 3').item.json.created_for_email }}",
+            "type": "slack-info"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1328,
+        160
+      ],
+      "id": "7fd219bc-8c20-45a7-94fa-2a1e42004e31",
+      "name": "Create Slack Notification Record",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "user_story_id",
+              "condition": "IS NOT NULL"
+            },
+            {
+              "column": "type",
+              "value": "create-mcqs-action"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -64,
+        -64
+      ],
+      "id": "12532079-ada7-4636-b4e9-2b818b4c5a24",
+      "name": "MCQ's Action",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        128,
+        -64
+      ],
+      "id": "8868ee62-4879-41fa-aa32-6a0f603da5be",
+      "name": "Start Processing MCQ's Action",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.user_story_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        336,
+        -64
+      ],
+      "id": "fd303347-cbe3-4508-a04e-d3f0315431c7",
+      "name": "Fetch User Story Data 3",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3835e0ec-c34f-4a1a-8f9a-126256c592e0",
+              "name": "user_story_id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "b4b4a8b5-5d99-435f-805e-968475177f71",
+              "name": "mcqs_source_text",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "ac65cd87-8cba-461c-837d-99c0b790c189",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        -64
+      ],
+      "id": "996a73fc-6b92-4f30-b63c-37de16d6529f",
+      "name": "Set Node - Prepare MCQ's Input"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create EXACTLY 20 multiple-choice questions based ONLY on the main concepts in the user story description.\n\nRules:\n- Questions must test understanding of the concept, not memory of steps or details.\n- Do NOT ask about specific actions, numbers, or instructions mentioned in the story.\n- Questions should feel like a real quiz or test.\n- Provide 4 challenging options (A, B, C, D).\n- Only ONE option is correct.\n- Do NOT explain answers.\n- Do NOT highlight or mark the correct answer in the question section.\n\nFormatting:\n- Output MARKDOWN ONLY.\n- Add a fun but professional title at the top.\n- Number questions as Q1, Q2, etc.\n- Use bullet points for choices.\n- After all questions, provide an \"Answers\" section.\n- Format answers like this:\n\nAnswers:\nQ1: A\nQ2: C\nQ3: B\n...\nQ20: D\n\nUser story description:\n\"\"\"\n{{ $json.mcqs_source_text }}\n\"\"\"\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        768,
+        -64
+      ],
+      "id": "f061ad63-1dd4-4586-90a8-3624154567a1",
+      "name": "MCQ Generator AI Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "=mcqs_questions_{{$('Fetch User Story Data 3').item.json.title}}.md"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1104,
+        -64
+      ],
+      "id": "2f69863a-b739-429f-bb86-e34a3d37e4b6",
+      "name": "Convert to .md File"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        176
+      ],
+      "id": "f67a0ef4-b389-4453-ad59-7699dba44d77",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger6": {
+      "main": [
+        [
+          {
+            "node": "MCQ's Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload MCQs to S3": {
+      "main": [
+        [
+          {
+            "node": "Create Slack Notification Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCQ's Action": {
+      "main": [
+        [
+          {
+            "node": "Start Processing MCQ's Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing MCQ's Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch User Story Data 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch User Story Data 3": {
+      "main": [
+        [
+          {
+            "node": "Set Node - Prepare MCQ's Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Node - Prepare MCQ's Input": {
+      "main": [
+        [
+          {
+            "node": "MCQ Generator AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCQ Generator AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Convert to .md File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to .md File": {
+      "main": [
+        [
+          {
+            "node": "Upload MCQs to S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "MCQ Generator AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "0IChBcw2h3IUtGTn",
+    "timezone": "Asia/Muscat",
+    "executionTimeout": 900
+  },
+  "versionId": "3101cd70-5cf5-45e3-867e-867472e8b376",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f8dff506f39203aff5a692e2cd7a8a3c59ecdf9249101c2918e876da4cb7910"
+  },
+  "id": "wEFfl8VlCEhCEPxB",
+  "tags": []
+}

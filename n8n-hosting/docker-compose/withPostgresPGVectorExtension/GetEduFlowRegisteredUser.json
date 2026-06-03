@@ -1,0 +1,188 @@
+{
+  "name": "GetEduFlowRegisteredUser",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "eduflowusers",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        -16
+      ],
+      "id": "96f2b257-4c6c-44ae-818a-429437782945",
+      "name": "Webhook",
+      "webhookId": "52e086aa-632e-4b12-b2b9-93f5a3fb124f",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "operation": "rowExists",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YkFOabr3lOx2m1j7",
+          "mode": "list",
+          "cachedResultName": "registered_users",
+          "cachedResultUrl": "/projects/HyRCpubGH657vwDv/datatables/YkFOabr3lOx2m1j7"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email_address",
+              "keyValue": "={{ $json.query.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "2b52a0bc-bb18-4601-8467-54f60e867936",
+      "name": "If row exists",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "59da7e51-edc4-490a-90ab-a4a621a68e07",
+              "leftValue": "={{ $json.query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "0578167c-969c-409d-a967-6eb830b0452e",
+              "leftValue": "={{ $json.query.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "185f1b25-3689-477a-843b-16f6d57f1b8f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"msg\": \"Success!\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        -144
+      ],
+      "id": "427c225b-3350-4a76-ba63-0f027db1aac5",
+      "name": "Return 200"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"msg\": \"Not Found\"\n}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        112
+      ],
+      "id": "29983544-2b2b-4891-9c0e-e998b979baa2",
+      "name": "Return 404"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If row exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If row exists": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Return 200",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return 404",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return 200": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ef55019d-1848-4304-bd5b-7bd12d74fa46",
+  "meta": {
+    "instanceId": "7f8dff506f39203aff5a692e2cd7a8a3c59ecdf9249101c2918e876da4cb7910"
+  },
+  "id": "AMfx1WNG81qx8oR3",
+  "tags": []
+}

@@ -1,0 +1,5286 @@
+{
+  "name": "[0]EduFlowCoreWorkFlow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "serviceAccount",
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1xW4GrO0aeuKWFn58Z-IXgyeSqqOhdPj3",
+          "mode": "url"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        -1344
+      ],
+      "id": "ab260084-271a-4adf-81ee-decf71d9ba5d",
+      "name": "Google Drive Trigger",
+      "executeOnce": false,
+      "credentials": {
+        "googleApi": {
+          "id": "gl8u0oRNUDgYLYBu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Start Processing File ID').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -848,
+        -784
+      ],
+      "id": "d036eead-598a-42ae-b223-ffbadd582a61",
+      "name": "Download file",
+      "executeOnce": true,
+      "credentials": {
+        "googleApi": {
+          "id": "gl8u0oRNUDgYLYBu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Transcribe the recording and store it for later processing",
+        "height": 768,
+        "width": 1344
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        -1120
+      ],
+      "typeVersion": 1,
+      "id": "d327c159-e698-4696-9696-596e27ca518d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Process the transcription and store it",
+        "height": 976,
+        "width": 1616
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "07b68fc8-b260-4073-8ce3-035f3f881175",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Process meeting summary, shape user stories data and store it",
+        "height": 912,
+        "width": 1968
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "ab057566-da24-4690-9604-d17b4570edaf",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE transcriptions\nSET\n  summarized_content = $1,\n  processing = FALSE,\n  is_processed = TRUE\nWHERE\n  id = {{ $('Get Newest Transcription').first().json.id }};",
+        "options": {
+          "queryReplacement": "=$${{ $('Summarization AI Agent').item.json.output.summary_text }}$$"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        160,
+        240
+      ],
+      "id": "7e6d21ca-c7ce-4e5e-8236-596862b29eb1",
+      "name": "Update Meeting Summary Text",
+      "executeOnce": false,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": false,
+            "title": "={{ $json.output.title }}",
+            "description": "={{ $json.output.summary_text }}",
+            "created_for_name": "={{ $('Start Processing Transcription').first().json.author_name }}",
+            "created_for_email": "={{ $('Start Processing Transcription').first().json.author_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_for_name",
+              "displayName": "created_for_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_for_email",
+              "displayName": "created_for_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -80,
+        240
+      ],
+      "id": "c4caaf8b-7236-4c98-b5e7-602f09c20a1d",
+      "name": "Store User Story Data",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"summary_text\": {\n\t\t\t\"type\": \"string\",\n            \"description\": \"Text related to the meeting summary.\"\n\t\t},\n\t\t\"title\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"An interesting title reflecting the meeting summary\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        32
+      ],
+      "id": "3a9df92d-bcfc-493f-ba3f-97dcbe243673",
+      "name": "Filter Summary and Title"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Without loosing any important information of any discussed concepts, summarize the following meeting recording transcript (use bullet points wherever needed):\n\"\"\"\n{{ $json.content.slice(0, 110000) }}\n\"\"\"",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -48,
+        -208
+      ],
+      "id": "f0c2b983-0f35-42d3-bbdb-4165163d0428",
+      "name": "Summarization AI Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "transcriptions",
+          "mode": "list",
+          "cachedResultName": "transcriptions"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "content",
+              "condition": "IS NOT NULL"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -976,
+        -176
+      ],
+      "id": "f3a346a2-a33e-4bf8-8b3f-5499598e1691",
+      "name": "Get Newest Transcription",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "transcriptions",
+          "mode": "list",
+          "cachedResultName": "transcriptions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summarized_content",
+              "displayName": "summarized_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -768,
+        -176
+      ],
+      "id": "1337782a-5f1d-4a21-bf8e-d30c1e300543",
+      "name": "Start Processing Transcription",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "operation": "speechToText",
+        "additionalOptions": {
+          "languageCode": "en"
+        },
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        -784
+      ],
+      "id": "338b416a-c9e1-4c14-9fa0-4d2aea4ed428",
+      "name": "Transcribe Recording",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "R4Iwrf8wMOoqlcsk",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -976,
+        832
+      ],
+      "id": "8aea04c0-37b2-4219-95c3-b41e260c47df",
+      "name": "Get Newest User Story",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summarized_content",
+              "displayName": "summarized_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -736,
+        832
+      ],
+      "id": "5f800014-a4f7-407b-903e-7a9001cdbe7f",
+      "name": "Start Processing User Story",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=As a product owner, I need my team to get hands on experience on certain tools, technology and techniques. For this purpose, I need you to write a single user story with an interesting title, description and acceptance criteria (bullet points) that is simple to do and is based on a very simple real life use case. The use case should be based on the following discussion:\n\n\"\"\"\n{{ $json.description }}\n\"\"\"",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -512,
+        832
+      ],
+      "id": "ebe12828-423b-4638-b570-e08b9c0c2253",
+      "name": "User Stories Processor AI Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"story_description\": {\n\t\t\t\"type\": \"string\",\n            \"description\": \"Text related to the description of the user story.\"\n\t\t},\n\t\t\"title\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Title related to the user story.\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        1040
+      ],
+      "id": "cb086ca7-2a92-4dce-b5de-8f68be3b7633",
+      "name": "Filter Story Desc and Title"
+    },
+    {
+      "parameters": {
+        "content": "## [DEPRECATED - DO NOT EDIT] - Moved to a separate workflow] Perform GitHub Actions (Create Issue) based on stored user stories data",
+        "height": 880,
+        "width": 1952,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1264,
+        1728
+      ],
+      "typeVersion": 1,
+      "id": "615b6ff1-d0ce-4366-a4c0-f6ebe37bfc1b",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing User Story').item.json.id }}",
+            "processed_description": "={{ $json.result }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        832
+      ],
+      "id": "15fa096e-3902-4a0a-a35f-8e847684e4aa",
+      "name": "Update User Story With Processed Description",
+      "executeOnce": false,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\ntitle = item[\"json\"][\"title\"]\ndesc = item[\"json\"][\"story_description\"]\n\nresult = json.dumps({\"title\": title, \"description\": desc})\n\nreturn {\"result\": result}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        832
+      ],
+      "id": "6f1dcf28-482d-4f62-b6d7-b9d6f71cc51a",
+      "name": "Dump Ticket Description as JSON String",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": false,
+            "type": "create-git-issue",
+            "user_story_id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        1264
+      ],
+      "id": "743da824-c39a-4837-9e8d-202984840cc8",
+      "name": "Add Github Issues Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": false,
+            "type": "create-clickup-issue",
+            "user_story_id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        832
+      ],
+      "id": "088ffe00-3602-4afb-9c1a-35b81aed69fe",
+      "name": "Add ClickUp Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summarized_content",
+              "displayName": "summarized_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -720,
+        1808
+      ],
+      "id": "aded9683-c55c-477c-a9be-37ea6d3eccc9",
+      "name": "Start Processing Git Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "user_story_id",
+              "condition": "IS NOT NULL"
+            },
+            {
+              "column": "type",
+              "value": "create-git-issue"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -944,
+        1808
+      ],
+      "id": "4f0c09c6-9b07-44e8-9ff2-5958d8233af3",
+      "name": "Get Git Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.user_story_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -496,
+        1808
+      ],
+      "id": "cba844ca-e6f6-477c-a842-7054372dca97",
+      "name": "Fetch User Story Data",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "CodelineAtyab",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AgileOraclesExperimentProject",
+          "mode": "list",
+          "cachedResultName": "AgileOraclesExperimentProject",
+          "cachedResultUrl": "https://github.com/CodelineAtyab/AgileOraclesExperimentProject"
+        },
+        "title": "=[{{ $('Fetch User Story Data').item.json.created_for_email }}] {{ $('Get JSON from processed description').item.json.title }}",
+        "body": "={{ $json.output }}",
+        "labels": [],
+        "assignees": []
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        2032
+      ],
+      "id": "45047128-6aa9-4f7e-81cf-c422dbab6fed",
+      "name": "Create an issue",
+      "webhookId": "8e1e6497-a310-47ab-adfe-48aad6139200",
+      "executeOnce": true,
+      "credentials": {
+        "githubApi": {
+          "id": "gBKbqcjo8SK2uat8",
+          "name": "EduFlow GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\nprocessed_desc = item[\"json\"][\"processed_description\"]\n\nreturn json.loads(processed_desc)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        1808
+      ],
+      "id": "40b6dfa0-9761-4f90-8a81-168752f731c9",
+      "name": "Get JSON from processed description",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Just beautify this description using md format. Make sure no important information is lost. \nIf something needs to be added, please add.\nUse tables, bulletpoints and styling whereever necessary.\nThis is the description of the user story:\n\n\"\"\"\n{{ $json.description }}\n\"\"\"\nonly give the answer without any extra comments",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -944,
+        2048
+      ],
+      "id": "0421226f-b296-4998-8b51-b7b54316baaf",
+      "name": "User Stories Processor AI Agent1",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -576,
+        1040
+      ],
+      "id": "b1f0d903-4ec2-4a5c-acb5-87b8e8b84b43",
+      "name": "OpenAI O3 Node Two",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -944,
+        2272
+      ],
+      "id": "7c9af0c7-4a27-43c5-b8c7-372e230e20fe",
+      "name": "OpenAI O3 Node 3",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        48
+      ],
+      "id": "c00ad008-4341-4fff-9e19-2369cdf5aabe",
+      "name": "OpenAI O3 Node 1",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Send Notifications",
+        "height": 544,
+        "width": 1952
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1264,
+        3216
+      ],
+      "typeVersion": 1,
+      "id": "4f22dffd-efb1-4786-a93a-e39a0ccf771b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "transcriptions",
+          "mode": "list",
+          "cachedResultName": "transcriptions"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        -176
+      ],
+      "id": "0a1be810-09e6-43f5-a800-014fb917d936",
+      "name": "On Transcription Creation",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        832
+      ],
+      "id": "b88e2a6c-43da-4877-8d05-0239068b563b",
+      "name": "On User Story Creation",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        1808
+      ],
+      "id": "e510c727-fdd4-449e-a9f3-7b1911c580ad",
+      "name": "On Action Creation",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        3312
+      ],
+      "id": "8e258627-8611-4e37-abfc-12b6e6f996cf",
+      "name": "On Notification Creation",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "type",
+              "value": "slack-info"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -992,
+        3312
+      ],
+      "id": "6558f467-e539-412d-a67b-13c9691f4a08",
+      "name": "Get Slack Notification",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\ndestination, type = item[\"json\"][\"type\"].split(\"-\")\n\nreturn {\"type\": type, \"destination\": destination}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        3296
+      ],
+      "id": "c8cebca7-1d3e-4378-ae56-6e97a66254c7",
+      "name": "Get Destination and Type Info",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5dabe17b-0ca5-46d5-a62d-66480dab9c7a",
+              "leftValue": "={{ $json.destination }}",
+              "rightValue": "slack",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        3296
+      ],
+      "id": "e08511e4-cd62-4bec-b33e-daed363720ef",
+      "name": "For Slack",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function truncateSlackMessage(inputMessage, maxLength = 2900) {\n  // Check if truncation is needed\n  if (inputMessage.length <= maxLength) {\n    return {message: JSON.stringify(inputMessage).slice(1, -1), truncated: false};\n  }\n  \n  // Truncate the message\n  let truncatedMessage = inputMessage.substring(0, maxLength);\n  \n  // Add an indicator that the message was truncated\n  truncatedMessage += \"... [Message truncated due to length limits].\";\n  \n  return {\n    message: JSON.stringify(truncatedMessage).slice(1, -1), \n    truncated: true,\n    messageLength: truncatedMessage.length\n  };\n}\n\nreturn truncateSlackMessage($('Get Slack Notification').item.json.message);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        3280
+      ],
+      "id": "1ae7a42a-efb3-4c11-a95b-f99e24ea98b0",
+      "name": "Process new lines"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5dabe17b-0ca5-46d5-a62d-66480dab9c7a",
+              "leftValue": "={{ $json.is_app_msg }}",
+              "rightValue": "teams",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        3312
+      ],
+      "id": "8fb4107f-023c-40e0-90a2-2b09936a6f1a",
+      "name": "Application Message",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -560,
+        3296
+      ],
+      "id": "043cd816-21a2-42e9-b210-feaa8be1a08c",
+      "name": "Start Processing Slack Notification",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.slack_webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"blocks\": [\n\t\t{\n\t\t\t\"type\": \"section\",\n\t\t\t\"text\": {\n\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\"text\": \"{{ $('Set Notification For Email').item.json.message }}\"\n\t\t\t}\n\t\t}\n\t]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        3536
+      ],
+      "id": "28055cef-8b6f-483f-b8aa-7b4a0cd7ce44",
+      "name": "Slack Alert Webhook",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing Slack Notification').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        3536
+      ],
+      "id": "758f05ad-dfae-4eb5-8287-1539719c7709",
+      "name": "Update Slack Notification Record As Processed",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Individual Nodes",
+        "height": 1072
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        -1424
+      ],
+      "typeVersion": 1,
+      "id": "6158677f-6f9b-4f33-9fed-aefb5b3c7ee3",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Successfully created a github issue {{ $('Create an issue').item.json.html_url }}\non {{ $now.format('yyyy-MM-dd HH:mm:ss') }}\non behalf of {{ $('Fetch User Story Data').item.json.created_for_email }}\nusing github account for {{ $('Create an issue').item.json.user.login }}",
+            "for_user_email": "={{ $('Fetch User Story Data').item.json.created_for_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        2016
+      ],
+      "id": "e3955a3b-d056-4153-86b0-f2f558837cdd",
+      "name": "Store Slack Success Notification",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "queryString": "*.mp4",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "https://drive.google.com/drive/folders/1xW4GrO0aeuKWFn58Z-IXgyeSqqOhdPj3",
+            "mode": "url"
+          }
+        },
+        "options": {
+          "fields": "={{ [\"id\",\"mimeType\",\"name\", \"owners\"] }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -944,
+        -1344
+      ],
+      "id": "b07dc86c-e4f1-4a49-8559-f7dc17556696",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleApi": {
+          "id": "gl8u0oRNUDgYLYBu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Get newly uploaded files",
+        "height": 256,
+        "width": 1344
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        -1424
+      ],
+      "typeVersion": 1,
+      "id": "b7705c8a-c2c7-4a1a-b205-54f96a11c14b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT '{{ $json.id }}' AS id\nWHERE NOT EXISTS (\n    SELECT 1 FROM uploaded_files WHERE id = '{{ $json.id }}'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -672,
+        -1344
+      ],
+      "id": "e22e06b2-0ced-4678-b501-be51e3f9994e",
+      "name": "Get New File IDs",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "uploaded_files",
+          "mode": "list",
+          "cachedResultName": "uploaded_files"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": false,
+            "id": "={{ $json.id }}",
+            "author_name": "={{ $('Search files and folders').item.json.owners[0].displayName }}",
+            "author_email": "={{ $('Search files and folders').item.json.owners[0].emailAddress }}",
+            "file_name": "={{ $('Search files and folders').item.json.name }}",
+            "created_at": "={{ $('Google Drive Trigger').item.json.createdTime }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -128,
+        -1344
+      ],
+      "id": "2dae5094-5de2-4ba0-833d-f25ebdf31af5",
+      "name": "Store file IDs to consider",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "uploaded_files",
+          "mode": "list",
+          "cachedResultName": "uploaded_files"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        -1008
+      ],
+      "id": "7359c805-3f57-466c-b85d-7ccf077565ff",
+      "name": "New Files Detected",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "uploaded_files",
+          "mode": "list",
+          "cachedResultName": "uploaded_files"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "created_at"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1008,
+        -1008
+      ],
+      "id": "16c1bf6e-118d-4c8b-9167-37202f28a3c2",
+      "name": "Get Newest File ID",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "uploaded_files",
+          "mode": "list",
+          "cachedResultName": "uploaded_files"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -752,
+        -1008
+      ],
+      "id": "ced411d8-b421-4883-a760-7456b0667184",
+      "name": "Start Processing File ID",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO transcriptions (file_name, author_name, author_email, content)\nVALUES ($1, $2, $3, $4);",
+        "options": {
+          "queryReplacement": "='{{ $('Start Processing File ID').item.json.file_name }}','{{ $('Start Processing File ID').item.json.author_name }}','{{ $('Start Processing File ID').item.json.author_email }}',$${{ $('Start Processing File ID').item.json.id }}$$"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -480,
+        -576
+      ],
+      "id": "df1f9c9e-01e2-493d-9cdc-d7e356f81d46",
+      "name": "Store Transcription",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "uploaded_files",
+          "mode": "list",
+          "cachedResultName": "uploaded_files"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing File ID').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -128,
+        -576
+      ],
+      "id": "a7cb4a0d-d282-4b9c-b615-fcf35e5d387f",
+      "name": "Update File ID as Processed",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": false,
+            "type": "create-teams-daily-status",
+            "user_story_id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        1024
+      ],
+      "id": "0005d6d3-4204-4fe9-a9a9-2c16da09a0c9",
+      "name": "Add Daily Status Teams Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -208,
+        2992
+      ],
+      "id": "ffd48b2b-09fe-418d-8cdb-31c2c40ad60b",
+      "name": "OpenAI O3 Node ",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        2752
+      ],
+      "id": "3f09a56a-b49a-437d-9d34-c1e8025e06b3",
+      "name": "On Action Creation1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "user_story_id",
+              "condition": "IS NOT NULL"
+            },
+            {
+              "column": "type",
+              "value": "create-teams-daily-status"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -992,
+        2752
+      ],
+      "id": "30577a83-eaf9-4f43-a194-ad1a16187496",
+      "name": "Get Teams Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summarized_content",
+              "displayName": "summarized_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -768,
+        2752
+      ],
+      "id": "f7541e5a-05d3-43f6-b198-76cb6611492c",
+      "name": "Start Processing Teams Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.user_story_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -544,
+        2752
+      ],
+      "id": "fa39a662-7d03-4d64-9be9-7cb262fa64c2",
+      "name": "Fetch User Story Data Node 2",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me a daily scrum status using unordered list items in html format based on the following things I covered today.\n\n\"\"\"\n{{ $('Fetch User Story Data Node 2').item.json.description }}\n\"\"\"\n\nMake sure to only use the following allowed html tags (examples below) to make it look good:\n\"\n1. <strong>text</strong> (for bold)\n2. <em>text</em> (for italic)\n3. <h3>Text</h3> (<h1> <h2> or <h3> for headings)\n4. <strike>text</strike> (for strikethrough\ttext)\n5. <ol><li>text</li><li>text</li></ol> (for ordered list)\n6. <ul><li>text</li><li>text</li></ul> (for unordered list)\t\n7. <pre>text</pre> (for preformatted text)\n\"\n\nThe status should only reflect:\n1. The things I covered\n2. The thinkgs I will cover\n3. Blockers\n4. A funny note to reflect the status\n\nOnly give the result without any extra comments.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        2752
+      ],
+      "id": "129d8d7e-0763-4094-bf7d-164bb6e44728",
+      "name": "Daily Status Processor AI Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://default6f1bd9ba810d45ab9cc6e34cb343de.1d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/47e91548260d4fbba908e9d7579086bb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=zz3UzFRuakSGBPDlxHsaqbKldAVjllBRxiPknO64Pzw",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"notification_message\": \"<p><em>Status of {{ $('Fetch User Story Data Node 2').item.json.created_for_email }}</em></p>{{ $json.processed_result }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        2752
+      ],
+      "id": "fb2d7789-be50-4637-ba39-30807991e050",
+      "name": "Post Daily Status on Teams",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing Teams Action').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        2976
+      ],
+      "id": "f5539030-521c-4497-8571-34670e1e3f25",
+      "name": "Update Action Record As Processed Node 2",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Successfully posted Daily Status on Teams Chat \non {{ $now.format('yyyy-MM-dd HH:mm:ss') }} \non behalf of {{ $('Fetch User Story Data Node 2').item.json.created_for_email }}",
+            "for_user_email": "={{ $('Fetch User Story Data Node 2').item.json.created_for_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        464,
+        2976
+      ],
+      "id": "41c61f50-2eb7-487e-b0dd-fbe311285071",
+      "name": "Store Slack Success Notification Node 2",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{}",
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "output.title, output.story_description",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        832
+      ],
+      "id": "f8dd97e4-8f00-4c1c-bf87-dd42c64b778e",
+      "name": "Convert to JSON",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing Git Action').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        1808
+      ],
+      "id": "8c663af8-ea02-4d0f-9f93-9f7fcf86ecea",
+      "name": "Update Github Action Record As Processed",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "user_story_id": "={{ $('Get Git Action').item.json.user_story_id }}",
+            "type": "create-clickup-issue"
+          },
+          "matchingColumns": [
+            "user_story_id",
+            "type"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        2208
+      ],
+      "id": "f8e3dcbc-4c64-4187-82f7-32ce1d931ea5",
+      "name": "Update ClickUP Action Record As Processed",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Successfully created a ClickUP issue ({{ $('Create a task').item.json.folder.name }} -> {{ $('Create a task').item.json.list.name }}) -> {{ $('Create a task').item.json.url }}\non {{ $now.format('yyyy-MM-dd HH:mm:ss') }}\non behalf of {{ $('Fetch User Story Data').item.json.created_for_email }}\nusing ClickUP API",
+            "for_user_email": "={{ $('Fetch User Story Data').item.json.created_for_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        2416
+      ],
+      "id": "322cfd51-e084-412e-a99c-c52c44376a28",
+      "name": "Store Slack Success Notification1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Summary of the meeting by {{ $('Start Processing Transcription').first().json.author_email }}:\n{{ $('Summarization AI Agent').item.json.output.summary_text }}",
+            "for_user_email": "={{ $('Get Newest Transcription').first().json.author_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -80,
+        464
+      ],
+      "id": "096fce8c-8d21-438d-86ab-623b96dee29c",
+      "name": "Store Slack Notification with Summary",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS uploaded_files (\n\t\t  id text PRIMARY KEY,\n\t\t\tfile_name text,\n\t\t\tauthor_name text DEFAULT null,\n\t\t  author_email text DEFAULT null,\n\t\t  processing boolean DEFAULT false,\n\t\t  is_processed boolean DEFAULT false,\n\t\t\tcreated_at timestamptz DEFAULT now()\n\t\t);\n\n\t\t-- Create transcriptions table\n\t\tCREATE TABLE IF NOT EXISTS transcriptions (\n\t\t  id SERIAL PRIMARY KEY,\n\t\t  timestamp timestamptz DEFAULT now(),\n\t\t  file_name text,\n\t\t  author_name text DEFAULT null,\n\t\t  author_email text DEFAULT null,\n\t\t  content text,\n\t\t\tsummarized_content text DEFAULT null,\n\t\t  processing boolean DEFAULT false,\n\t\t  is_processed boolean DEFAULT false\n\t\t);\n\t\t\n\t\t-- Create user_stories table\n\t\tCREATE TABLE IF NOT EXISTS user_stories (\n\t\t  id SERIAL PRIMARY KEY,\n\t\t  timestamp timestamptz DEFAULT now(),\n\t\t  title text,\n\t\t  description text,\n\t\t\tprocessed_description text DEFAULT null,\n\t\t\tcreated_for_name text DEFAULT 'Everyone',\n  \t\tcreated_for_email text DEFAULT 'everyone@org.com',\n\t\t\tprocessing boolean DEFAULT false,\n\t\t\tis_processed boolean DEFAULT false\n\t\t);\n\t\t\n\t\t-- Create notifications table\n\t\tCREATE TABLE IF NOT EXISTS notifications (\n\t\t  id SERIAL PRIMARY KEY,\n\t\t  timestamp timestamptz DEFAULT now(),\n\t\t  message text,\n\t\t  is_app_msg boolean DEFAULT true,\n\t\t  type text,\n\t\t\tprocessing boolean DEFAULT false,\n\t\t\tis_processed boolean DEFAULT false\n\t\t);\n\n\t\t-- Create actions table with user_story_id as a foreign key\n\t\tCREATE TABLE IF NOT EXISTS actions (\n\t\t\tid SERIAL PRIMARY KEY,\n\t\t\ttimestamp timestamptz DEFAULT now(),\n\t\t\ttype text NOT NULL, -- e.g., 'create-clickup-ticket', 'create-git-issue', etc.\n\t\t\tprocessing boolean DEFAULT false,\n\t\t\tis_processed boolean DEFAULT false,\n\t\t\tuser_story_id integer,\n\t\t\tCONSTRAINT fk_actions_user_story\n\t\t\t\tFOREIGN KEY (user_story_id)\n\t\t\t\tREFERENCES user_stories(id)\n\t\t\t\tON DELETE SET NULL\n\t\t);\n\nCREATE TABLE IF NOT EXISTS mentor_mind_logs (\n\t\t  id SERIAL PRIMARY KEY,\n\t\t  timestamp timestamptz DEFAULT now(),\n\t\t  message text,\n\t\t  type text\n\t\t);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        144,
+        -784
+      ],
+      "id": "c78380e2-2e93-4022-b5b8-df6b384471d3",
+      "name": "Create All Tables",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table uploaded_files;\ndrop table transcriptions;\ndrop table actions;\ndrop table user_stories;\ndrop table notifications;\ndrop table mentor_mind_logs;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        144,
+        -544
+      ],
+      "id": "1fc80ecc-03f6-4a6c-96a6-bd6f94e67935",
+      "name": "Drop All Tables",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from transcriptions where processing = TRUE;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        144,
+        -1328
+      ],
+      "id": "659e582d-ddb5-4284-801d-33c9ef15a76d",
+      "name": "Execute SQL Query",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -1344
+      ],
+      "id": "36a039b5-a99b-4fa9-816c-ddd0bcbc06cc",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1232,
+        -800
+      ],
+      "id": "c43917e0-70fd-451a-80b0-e0c255411eb5",
+      "name": "Schedule Trigger",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1232,
+        48
+      ],
+      "id": "ced94a79-0540-4fd8-b70e-e9e25f01221c",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1232,
+        1024
+      ],
+      "id": "57dc02e9-61ae-4a7a-b598-cc0f2e10c4a3",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1216,
+        2048
+      ],
+      "id": "a0f8f174-058b-4f14-91b2-effe124c8506",
+      "name": "Schedule Trigger3"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1216,
+        2944
+      ],
+      "id": "bb18669a-d174-4358-96c1-a587005335f8",
+      "name": "Schedule Trigger4"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1200,
+        3536
+      ],
+      "id": "546d5bfc-6a52-47d3-a301-99e283e86f0b",
+      "name": "Schedule Trigger5"
+    },
+    {
+      "parameters": {
+        "team": "90182412838",
+        "space": "90189663579",
+        "folder": "901812018560",
+        "list": "901815728172",
+        "name": "={{ $('Get JSON from processed description').item.json.title }}",
+        "additionalFields": {
+          "content": "={{ $json.output }}",
+          "markdownContent": true,
+          "tags": [
+            "template"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        48,
+        2256
+      ],
+      "id": "7ef361cb-eb86-431d-81d7-a03414e5934e",
+      "name": "Create a task",
+      "executeOnce": true,
+      "credentials": {
+        "clickUpApi": {
+          "id": "o8frSyItnFOAgt9x",
+          "name": "ClickUp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "transcription-bucket",
+        "fileName": "={{ $('Start Processing File ID').item.json.id }}.txt",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -784
+      ],
+      "id": "ebd39869-a3d9-4f2a-ab7a-350bc3df474c",
+      "name": "Upload a file",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "s3": {
+          "id": "k1ntcpwn5V9YQ7hV",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        -784
+      ],
+      "id": "e0487d59-7800-419a-9589-3f27c37e3d45",
+      "name": "Transcript Content to Text File"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "destinationKey": "content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        32
+      ],
+      "id": "61b8d51d-826a-4120-9a98-8c10d131f2be",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "update actions set processing=FALSE where is_processed=TRUE;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        144,
+        -1008
+      ],
+      "id": "b5856cc1-4f19-43e6-823b-c9b633b01ddd",
+      "name": "Debug Queries",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "transcription-bucket",
+        "limit": 1,
+        "options": {
+          "folderKey": "={{ $json.id }}.txt"
+        }
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -1008
+      ],
+      "id": "441f90c8-76ba-49b9-af4f-c7a574219b0e",
+      "name": "Get many files",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "s3": {
+          "id": "k1ntcpwn5V9YQ7hV",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "93067c23-923e-4744-9856-98fd21b71f9b",
+              "leftValue": "={{ $json.Key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2633f272-ae1a-4662-9d3d-35226947c0d0",
+              "leftValue": "={{ $json.Key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        -1008
+      ],
+      "id": "5830c727-5435-4d47-86e0-32490d91cc16",
+      "name": "Transcription Exists",
+      "executeOnce": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -784
+      ],
+      "id": "729c33b5-4962-4b3f-9d31-1fd6eb2fac15",
+      "name": "Transcription Data is in Bucket",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "49131602-e4c0-4bf5-806b-4e524d57a572",
+              "leftValue": "={{ $json.Key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1008,
+        -592
+      ],
+      "id": "2e252942-f586-4e25-8689-5e148949fec7",
+      "name": "Transcription Doesn't Exist"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\nprocessed_desc = item[\"json\"][\"processed_description\"]\n\nreturn json.loads(processed_desc)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        2752
+      ],
+      "id": "e72b5cf3-f290-4c00-92ec-cf64937168b0",
+      "name": "Get JSON from processed description Node 2",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"result_html_string\": {\n\t\t\t\"type\": \"string\",\n            \"description\": \"Daily status in HTML format.\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        2992
+      ],
+      "id": "f00b69f6-be33-4265-808d-cfd35e005d45",
+      "name": "Get HTML String"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\nhtml_string = \"\".join(item[\"json\"][\"output\"][\"result_html_string\"].split(\"\\n\"))\n\nprocessed_string = json.dumps(html_string)\n\nreturn {\"processed_result\": processed_string[1:-1]}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        2752
+      ],
+      "id": "db0c5948-7219-4a0d-80c6-cfc33b584cbb",
+      "name": "Remove New Lines"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"for_user_email\": \"{{ $('Get Slack Notification').item.json.for_user_email }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        3280
+      ],
+      "id": "890c59fc-6bf7-4ef3-907d-360e375749fc",
+      "name": "Set Notification For Email"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YkFOabr3lOx2m1j7",
+          "mode": "list",
+          "cachedResultName": "registered_users",
+          "cachedResultUrl": "/projects/HyRCpubGH657vwDv/datatables/YkFOabr3lOx2m1j7"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email_address",
+              "keyValue": "={{ $json.for_user_email.toLowerCase() }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        3536
+      ],
+      "id": "7756c411-e1e9-42c0-8bf9-eeade329c500",
+      "name": "Get Slack Webhook URL for User"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": false,
+            "type": "create-mcqs-action",
+            "user_story_id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        448,
+        1488
+      ],
+      "id": "952cc4d6-c63c-4975-b5d2-5825b06a6397",
+      "name": "Add MCQ's Action",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "bucketName": "eduflow-transcriptions",
+        "fileKey": "={{ $json.file_name }}"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        240
+      ],
+      "id": "6564c455-503a-4b27-b77b-c22ac6cd7c68",
+      "name": "Download From Cloudflare R2 S3",
+      "credentials": {
+        "s3": {
+          "id": "loZdO55NKsY8saA4",
+          "name": "Cloudflare R2 S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "bucketName": "transcription-bucket",
+        "fileKey": "={{ $json.content }}.txt"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        48
+      ],
+      "id": "b33e333e-bed0-4cc0-942f-52d9e6b540bc",
+      "name": "Download from MinIO S3",
+      "retryOnFail": true,
+      "credentials": {
+        "s3": {
+          "id": "k1ntcpwn5V9YQ7hV",
+          "name": "S3 account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Perform Teams Actions (Send Daily Scrum Status) based on stored user stories data",
+        "height": 480,
+        "width": 1952,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1264,
+        2672
+      ],
+      "typeVersion": 1,
+      "id": "67962c7d-2df9-4467-a338-ecd896e2f147",
+      "name": "Sticky Note7"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Meeting Summary Text": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Notification with Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Summary and Title": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Summarization AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Store User Story Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Newest Transcription": {
+      "main": [
+        [
+          {
+            "node": "Start Processing Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing Transcription": {
+      "main": [
+        [
+          {
+            "node": "Download from MinIO S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Recording": {
+      "main": [
+        [
+          {
+            "node": "Transcript Content to Text File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Newest User Story": {
+      "main": [
+        [
+          {
+            "node": "Start Processing User Story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing User Story": {
+      "main": [
+        [
+          {
+            "node": "User Stories Processor AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Story Desc and Title": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "User Stories Processor AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Stories Processor AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Convert to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update User Story With Processed Description": {
+      "main": [
+        [
+          {
+            "node": "Add Github Issues Action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add ClickUp Action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add Daily Status Teams Action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add MCQ's Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dump Ticket Description as JSON String": {
+      "main": [
+        [
+          {
+            "node": "Update User Story With Processed Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Github Issues Action": {
+      "main": [
+        []
+      ]
+    },
+    "Get Git Action": {
+      "main": [
+        [
+          {
+            "node": "Start Processing Git Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing Git Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch User Story Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch User Story Data": {
+      "main": [
+        [
+          {
+            "node": "Get JSON from processed description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get JSON from processed description": {
+      "main": [
+        [
+          {
+            "node": "User Stories Processor AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Stories Processor AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Create an issue",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI O3 Node Two": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "User Stories Processor AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI O3 Node 3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "User Stories Processor AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI O3 Node 1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue": {
+      "main": [
+        [
+          {
+            "node": "Update Github Action Record As Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Transcription Creation": {
+      "main": [
+        []
+      ]
+    },
+    "On User Story Creation": {
+      "main": [
+        []
+      ]
+    },
+    "On Action Creation": {
+      "main": [
+        []
+      ]
+    },
+    "On Notification Creation": {
+      "main": [
+        []
+      ]
+    },
+    "Get Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Application Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Destination and Type Info": {
+      "main": [
+        [
+          {
+            "node": "For Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Slack": {
+      "main": [
+        [
+          {
+            "node": "Process new lines",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Process new lines": {
+      "main": [
+        [
+          {
+            "node": "Set Notification For Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Application Message": {
+      "main": [
+        [
+          {
+            "node": "Start Processing Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Get Destination and Type Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Alert Webhook": {
+      "main": [
+        [
+          {
+            "node": "Update Slack Notification Record As Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Get New File IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New File IDs": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store file IDs to consider": {
+      "main": [
+        []
+      ]
+    },
+    "New Files Detected": {
+      "main": [
+        []
+      ]
+    },
+    "Get Newest File ID": {
+      "main": [
+        [
+          {
+            "node": "Start Processing File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing File ID": {
+      "main": [
+        [
+          {
+            "node": "Get many files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Transcription": {
+      "main": [
+        [
+          {
+            "node": "Update File ID as Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI O3 Node ": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Daily Status Processor AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Action Creation1": {
+      "main": [
+        []
+      ]
+    },
+    "Get Teams Action": {
+      "main": [
+        [
+          {
+            "node": "Start Processing Teams Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing Teams Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch User Story Data Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch User Story Data Node 2": {
+      "main": [
+        [
+          {
+            "node": "Get JSON from processed description Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Status Processor AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Remove New Lines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Daily Status on Teams": {
+      "main": [
+        [
+          {
+            "node": "Update Action Record As Processed Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Action Record As Processed Node 2": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Success Notification Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to JSON": {
+      "main": [
+        [
+          {
+            "node": "Dump Ticket Description as JSON String",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Github Action Record As Processed": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update ClickUP Action Record As Processed": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Success Notification1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create All Tables": {
+      "main": [
+        []
+      ]
+    },
+    "Store User Story Data": {
+      "main": [
+        [
+          {
+            "node": "Update Meeting Summary Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Store file IDs to consider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Newest File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get Newest Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Get Newest User Story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger3": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger4": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger5": {
+      "main": [
+        [
+          {
+            "node": "Get Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a task": {
+      "main": [
+        [
+          {
+            "node": "Update ClickUP Action Record As Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "Transcription Data is in Bucket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Content to Text File": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Summarization AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many files": {
+      "main": [
+        [
+          {
+            "node": "Transcription Exists",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Transcription Doesn't Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcription Exists": {
+      "main": [
+        [
+          {
+            "node": "Transcription Data is in Bucket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Transcription Data is in Bucket": {
+      "main": [
+        [
+          {
+            "node": "Store Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcription Doesn't Exist": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get JSON from processed description Node 2": {
+      "main": [
+        [
+          {
+            "node": "Daily Status Processor AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get HTML String": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Daily Status Processor AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove New Lines": {
+      "main": [
+        [
+          {
+            "node": "Post Daily Status on Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Notification For Email": {
+      "main": [
+        [
+          {
+            "node": "Get Slack Webhook URL for User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Slack Webhook URL for User": {
+      "main": [
+        [
+          {
+            "node": "Slack Alert Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download from MinIO S3": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download From Cloudflare R2 S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download From Cloudflare R2 S3": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "0IChBcw2h3IUtGTn",
+    "timezone": "Asia/Muscat",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true
+  },
+  "versionId": "48a7ed3a-8ca8-4492-a14b-4259158c524e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f8dff506f39203aff5a692e2cd7a8a3c59ecdf9249101c2918e876da4cb7910"
+  },
+  "id": "TAzJDLvbQ44LD0jp",
+  "tags": []
+}

@@ -1,0 +1,35 @@
+{
+  "name": "HealthCheck",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "isactive",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "163a4051-373c-46ee-aa83-92a3766c105d",
+      "name": "Webhook",
+      "webhookId": "705a62fc-f75f-48fc-acd3-32ba8b5d0f86"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "c25a97df-2718-4c70-8fb9-cc9ac9a87a90",
+  "meta": {
+    "instanceId": "7f8dff506f39203aff5a692e2cd7a8a3c59ecdf9249101c2918e876da4cb7910"
+  },
+  "id": "W9XaPwfx7MAlfkjU",
+  "tags": []
+}

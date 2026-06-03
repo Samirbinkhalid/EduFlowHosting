@@ -1,0 +1,870 @@
+{
+  "name": "[7][EduFlow Pipeline] Post Daily Scrum Status on Teams",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Perform Teams Actions (Send Daily Scrum Status) based on stored user stories data",
+        "height": 688,
+        "width": 1952
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -912,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "11dc489c-c40c-4423-823e-d2c7b90b5ed2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -416,
+        416
+      ],
+      "id": "48afe1b2-aa5b-4a42-87f3-77b1250fd79c",
+      "name": "OpenAI O3 Node ",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        -48
+      ],
+      "id": "bb2a4dcf-54e7-489d-8d7d-c04bb290ffab",
+      "name": "On Action Creation1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "user_story_id",
+              "condition": "IS NOT NULL"
+            },
+            {
+              "column": "type",
+              "value": "create-teams-daily-status"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -640,
+        -48
+      ],
+      "id": "408499af-7d2b-45fc-8495-e40d3fa7080b",
+      "name": "Get Teams Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summarized_content",
+              "displayName": "summarized_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -416,
+        -48
+      ],
+      "id": "bbec0f4c-9191-46b9-9fd2-a70f28df6918",
+      "name": "Start Processing Teams Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.user_story_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -192,
+        -48
+      ],
+      "id": "85bbf1fa-456d-48a9-b3c0-043df7a7c0e8",
+      "name": "Fetch User Story Data Node 2",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me a daily scrum status using unordered list items in html format based on the following things I covered today.\n\n\"\"\"\n{{ $('Fetch User Story Data Node 2').item.json.description }}\n\"\"\"\n\nMake sure to only use the following allowed html tags (examples below) to make it look good:\n\"\n1. <strong>text</strong> (for bold)\n2. <em>text</em> (for italic)\n3. <h3>Text</h3> (<h1> <h2> or <h3> for headings)\n4. <strike>text</strike> (for strikethrough\ttext)\n5. <ol><li>text</li><li>text</li></ol> (for ordered list)\n6. <ul><li>text</li><li>text</li></ul> (for unordered list)\t\n7. <pre>text</pre> (for preformatted text)\n\"\n\nThe status should only reflect:\n1. The things I covered\n2. The thinkgs I will cover\n3. Blockers\n4. A funny note to reflect the status\n\nOnly give the result without any extra comments.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        192
+      ],
+      "id": "43ae5921-3bb3-46dd-8a81-eff87453ccaa",
+      "name": "Daily Status Processor AI Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.teams_webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"notification_message\": \"<p><em>Status of {{ $('Fetch User Story Data Node 2').item.json.created_for_email }}</em></p>{{ $('Remove New Lines').item.json.processed_result }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        -48
+      ],
+      "id": "ad9a078b-7e88-432d-8f0c-5bb8eb18b544",
+      "name": "Post Daily Status on Teams",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing Teams Action').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        816,
+        -48
+      ],
+      "id": "d063ce94-5099-4c63-84ae-3f53ce6fefc3",
+      "name": "Update Action Record As Processed Node 2",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Successfully posted Daily Status on Teams Chat \non {{ $now.format('yyyy-MM-dd HH:mm:ss') }} \non behalf of {{ $('Fetch User Story Data Node 2').item.json.created_for_email }}",
+            "for_user_email": "={{ $('Fetch User Story Data Node 2').item.json.created_for_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        816,
+        192
+      ],
+      "id": "6b9df6d8-2511-4f00-90e7-7f4b902a49d1",
+      "name": "Store Slack Success Notification Node 2",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -864,
+        192
+      ],
+      "id": "813e7475-1164-4844-9548-406e2eaf8ce8",
+      "name": "Schedule Trigger4"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\nprocessed_desc = item[\"json\"][\"processed_description\"]\n\nreturn json.loads(processed_desc)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -48
+      ],
+      "id": "5285b99e-b198-4eb0-9c9b-7bff846c6d53",
+      "name": "Get JSON from processed description Node 2",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"result_html_string\": {\n\t\t\t\"type\": \"string\",\n            \"description\": \"Daily status in HTML format.\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        416
+      ],
+      "id": "e830ccc1-85f8-4a12-9782-a4d18efa0366",
+      "name": "Get HTML String"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\nhtml_string = \"\".join(item[\"json\"][\"output\"][\"result_html_string\"].split(\"\\n\"))\n\nprocessed_string = json.dumps(html_string)\n\nreturn {\"processed_result\": processed_string[1:-1]}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        192
+      ],
+      "id": "cfae686f-65b8-4768-892b-975823edc229",
+      "name": "Remove New Lines"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "update actions set is_processed=false, processing=false where id=510;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1168,
+        -16
+      ],
+      "id": "c2e2fd87-c557-4826-be54-828862db1c47",
+      "name": "Debug",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Debug Nodes",
+        "height": 688,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "b024fdc7-3d5e-4363-b0c0-0bf6936e0922",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YkFOabr3lOx2m1j7",
+          "mode": "list",
+          "cachedResultName": "registered_users",
+          "cachedResultUrl": "/projects/HyRCpubGH657vwDv/datatables/YkFOabr3lOx2m1j7"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email_address",
+              "keyValue": "={{ $('Fetch User Story Data Node 2').item.json.created_for_email.toLowerCase() }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "e7e908df-07b4-409f-9d4c-2b18eacf5708",
+      "name": "Get Teams Webhook URL for User"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI O3 Node ": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Daily Status Processor AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Teams Action": {
+      "main": [
+        [
+          {
+            "node": "Start Processing Teams Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Processing Teams Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch User Story Data Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch User Story Data Node 2": {
+      "main": [
+        [
+          {
+            "node": "Get JSON from processed description Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Status Processor AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Remove New Lines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Daily Status on Teams": {
+      "main": [
+        [
+          {
+            "node": "Update Action Record As Processed Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Action Record As Processed Node 2": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Success Notification Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger4": {
+      "main": [
+        [
+          {
+            "node": "Get Teams Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get JSON from processed description Node 2": {
+      "main": [
+        [
+          {
+            "node": "Daily Status Processor AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get HTML String": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Daily Status Processor AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove New Lines": {
+      "main": [
+        [
+          {
+            "node": "Get Teams Webhook URL for User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Teams Webhook URL for User": {
+      "main": [
+        [
+          {
+            "node": "Post Daily Status on Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Muscat",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 900,
+    "availableInMCP": false,
+    "errorWorkflow": "0IChBcw2h3IUtGTn"
+  },
+  "versionId": "5112a35d-3d43-4593-bc66-930c1ffb688b",
+  "meta": {
+    "instanceId": "7f8dff506f39203aff5a692e2cd7a8a3c59ecdf9249101c2918e876da4cb7910"
+  },
+  "id": "6fYJ8Nc8VkG1Icw1",
+  "tags": []
+}

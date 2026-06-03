@@ -1,0 +1,1367 @@
+{
+  "name": "[5][EduFlow Pipeline] Create User Stories",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Perform GitHub Actions (Create Issue) based on stored user stories data",
+        "height": 880,
+        "width": 1952,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -384,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "4c6c15e8-986f-48bc-903a-03eb394ffe1d",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": true,
+            "is_processed": false,
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_name",
+              "displayName": "author_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "author_email",
+              "displayName": "author_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summarized_content",
+              "displayName": "summarized_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        112,
+        -16
+      ],
+      "id": "8713b870-3760-4442-9fc8-79691bb876cb",
+      "name": "Start Processing Git Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "processing",
+              "value": "false"
+            },
+            {
+              "column": "is_processed",
+              "value": "false"
+            },
+            {
+              "column": "user_story_id",
+              "condition": "IS NOT NULL"
+            },
+            {
+              "column": "type",
+              "value": "create-git-issue"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "cf7e1d47-f492-41c5-a909-d2ca91c029d4",
+      "name": "Get Git Action",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_stories",
+          "mode": "list",
+          "cachedResultName": "user_stories"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.user_story_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        336,
+        -16
+      ],
+      "id": "c0de90ea-371d-49f9-a56f-9263cbee89fe",
+      "name": "Fetch User Story Data",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "import json\n\nprocessed_desc = item[\"json\"][\"processed_description\"]\n\nreturn json.loads(processed_desc)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -16
+      ],
+      "id": "cc3c66de-a226-4c8a-a1b7-44aca55df460",
+      "name": "Get JSON from processed description",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3",
+          "mode": "list",
+          "cachedResultName": "o3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        480
+      ],
+      "id": "556de458-5549-4153-9760-d3808266687d",
+      "name": "OpenAI O3 Node 3",
+      "credentials": {
+        "openAiApi": {
+          "id": "LyVduIkZvSYu0XcW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "tableName": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "c1e3efe5-f67e-4210-8678-97b561d4ac22",
+      "name": "On Action Creation",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Successfully created a github issue {{ $('Github Create Issue [Dynamic PAT]').item.json.html_url }}\non {{ $now.format('yyyy-MM-dd HH:mm:ss') }}\non behalf of {{ $('Fetch User Story Data').item.json.created_for_email }}\nusing github account for {{ $('Github Create Issue [Dynamic PAT]').item.json.user.login }}",
+            "for_user_email": "={{ $('Fetch User Story Data').item.json.created_for_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1344,
+        -16
+      ],
+      "id": "eb0f20cc-bb7f-4cb5-93d2-ee81317c2fb6",
+      "name": "Store Slack Success Notification",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "id": "={{ $('Start Processing Git Action').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_description",
+              "displayName": "processed_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1136,
+        -16
+      ],
+      "id": "518d03b4-27c6-486a-b312-a48f67e3c6d9",
+      "name": "Update Github Action Record As Processed",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "actions",
+          "mode": "list",
+          "cachedResultName": "actions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing": false,
+            "is_processed": true,
+            "user_story_id": "={{ $('Get Git Action').item.json.user_story_id }}",
+            "type": "create-clickup-issue"
+          },
+          "matchingColumns": [
+            "user_story_id",
+            "type"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_story_id",
+              "displayName": "user_story_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1136,
+        448
+      ],
+      "id": "f27cfcca-2c4e-4e8d-82ad-2e3af8a7ad1e",
+      "name": "Update ClickUP Action Record As Processed",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "notifications",
+          "mode": "list",
+          "cachedResultName": "notifications"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_app_msg": true,
+            "processing": false,
+            "is_processed": false,
+            "type": "slack-info",
+            "message": "=Successfully created a ClickUP issue ({{ $('Create ClickUp Task [Dynamic API Key]').item.json.folder.name }} -> {{ $('Create ClickUp Task [Dynamic API Key]').item.json.list.name }}) -> {{ $('Create ClickUp Task [Dynamic API Key]').item.json.url }}\non {{ $now.format('yyyy-MM-dd HH:mm:ss') }}\non behalf of {{ $('Fetch User Story Data').item.json.created_for_email }}\nusing ClickUP API",
+            "for_user_email": "={{ $('Fetch User Story Data').item.json.created_for_email }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_app_msg",
+              "displayName": "is_app_msg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing",
+              "displayName": "processing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_processed",
+              "displayName": "is_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "for_user_email",
+              "displayName": "for_user_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1344,
+        448
+      ],
+      "id": "d647b9e3-59be-46d5-9a89-22aae555d8ef",
+      "name": "Store Slack Success Notification1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -336,
+        224
+      ],
+      "id": "24f2d90f-b1a1-44b8-abf0-0059d19d6bb0",
+      "name": "Schedule Trigger3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $json.github_user_name }}/{{ $json.active_github_repo_name }}/issues",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.github_pat_token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=title",
+              "value": "=[{{ $('Fetch User Story Data').item.json.created_for_email }}] {{ $('Get JSON from processed description').item.json.title }}"
+            },
+            {
+              "name": "=body",
+              "value": "={{ $('User Stories Processor AI Agent').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        912,
+        -16
+      ],
+      "id": "9b3161d8-2747-41de-9ad9-2117bcfcadae",
+      "name": "Github Create Issue [Dynamic PAT]"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.github.com/repos/{{ \"daniyalmehmood\" }}/{{ \"Code-Champs-Working-Area\" }}/issues/4",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ \"PAT_HERE\" }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"state\": \"closed\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1664,
+        592
+      ],
+      "id": "b27d90b2-2ae8-4d6a-b6a9-b338cf9ccb82",
+      "name": "Github Close Issue [Dynamic PAT]"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "update actions set is_processed=FALSE where id in (15, 13);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1664,
+        0
+      ],
+      "id": "f57a97e0-1583-4b7d-9330-f7b8233ca04c",
+      "name": "Debug",
+      "credentials": {
+        "postgres": {
+          "id": "Aaj9ohMmphmPSaHj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Debug Nodes",
+        "height": 880,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1600,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "4d7765b2-e2c2-4e82-90cb-e9b1a4f637a8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.clickup.com/api/v2/list/{{ $json.clickup_backlog_id }}/task",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $json.clickup_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Get JSON from processed description').item.json.title }}"
+            },
+            {
+              "name": "markdown_description",
+              "value": "={{ $('User Stories Processor AI Agent').item.json.output }}"
+            },
+            {
+              "name": "tags",
+              "value": "={{ [\"template\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        912,
+        448
+      ],
+      "name": "Create ClickUp Task [Dynamic API Key]",
+      "id": "21fab535-5432-4c3d-8fda-2eb848ba61ef"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YkFOabr3lOx2m1j7",
+          "mode": "list",
+          "cachedResultName": "registered_users",
+          "cachedResultUrl": "/projects/HyRCpubGH657vwDv/datatables/YkFOabr3lOx2m1j7"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email_address",
+              "keyValue": "={{ $('Fetch User Story Data').item.json.created_for_email.toLowerCase() }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        336,
+        224
+      ],
+      "id": "bfc4a05d-0669-400e-9c48-10e2c332c52e",
+      "name": "Get User GitHub & ClickUp Info"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Just beautify this description using md format. Make sure no important information is lost. \nIf something needs to be added, please add.\nUse tables, bulletpoints and styling whereever necessary.\nThis is the description of the user story:\n\n\"\"\"\n{{ $json.description }}\n\"\"\"\nonly give the answer without any extra comments",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        224
+      ],
+      "id": "d258d45b-c483-4523-a4df-087856bf562d",
+      "name": "User Stories Processor AI Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "72430e76-2b2c-414d-912e-b9905665c2ea",
+              "leftValue": "={{ $json.github_pat_token }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b890a335-f92a-4aef-b5bc-3065d3057a57",
+              "leftValue": "={{ $json.github_user_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f57c3af3-c8b5-4591-915b-304516479bee",
+              "leftValue": "={{ $json.active_github_repo_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        224
+      ],
+      "id": "6ee9c3fa-f4d4-4759-8361-9513bcd37a98",
+      "name": "Github Data Exists"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "90c5c47c-5e56-486c-9696-f38d56e940bd",
+              "leftValue": "={{ $json.clickup_api_key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "72430e76-2b2c-414d-912e-b9905665c2ea",
+              "leftValue": "={{ $json.clickup_api_key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        464
+      ],
+      "id": "79839bb6-2f64-4e0c-878f-2207fcf22c33",
+      "name": "ClickUP Data Exists"
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "get",
+        "team": "90182709824",
+        "space": "901811047470",
+        "folderless": true,
+        "list": "901818440860"
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        176
+      ],
+      "id": "bc7db597-3bc3-426c-bc9c-32df2dd17829",
+      "name": "Get a list",
+      "credentials": {
+        "clickUpApi": {
+          "id": "ogBGBIPBEjmC74Ka",
+          "name": "EduFlow ClickUp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "=Samirbinkhalid",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "https://github.com/Samirbinkhalid/EduFlowApp",
+          "mode": "url"
+        },
+        "title": "Test",
+        "body": "Test",
+        "labels": [],
+        "assignees": []
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1664,
+        400
+      ],
+      "id": "de6f46fa-2cb1-4e8e-8011-0f38d965aa03",
+      "name": "Create an issue",
+      "webhookId": "de0eef86-0a55-46ee-8f50-196e9773b329",
+      "credentials": {
+        "githubApi": {
+          "id": "gBKbqcjo8SK2uat8",
+          "name": "EduFlow GitHub account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start Processing Git Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch User Story Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Git Action": {
+      "main": [
+        [
+          {
+            "node": "Start Processing Git Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch User Story Data": {
+      "main": [
+        [
+          {
+            "node": "Get JSON from processed description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get JSON from processed description": {
+      "main": [
+        [
+          {
+            "node": "User Stories Processor AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI O3 Node 3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "User Stories Processor AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Github Action Record As Processed": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update ClickUP Action Record As Processed": {
+      "main": [
+        [
+          {
+            "node": "Store Slack Success Notification1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger3": {
+      "main": [
+        [
+          {
+            "node": "Get Git Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Github Create Issue [Dynamic PAT]": {
+      "main": [
+        [
+          {
+            "node": "Update Github Action Record As Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User GitHub & ClickUp Info": {
+      "main": [
+        [
+          {
+            "node": "ClickUP Data Exists",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Github Data Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Stories Processor AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Get User GitHub & ClickUp Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create ClickUp Task [Dynamic API Key]": {
+      "main": [
+        [
+          {
+            "node": "Update ClickUP Action Record As Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Debug": {
+      "main": [
+        []
+      ]
+    },
+    "Github Data Exists": {
+      "main": [
+        [
+          {
+            "node": "Github Create Issue [Dynamic PAT]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ClickUP Data Exists": {
+      "main": [
+        [
+          {
+            "node": "Create ClickUp Task [Dynamic API Key]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "0IChBcw2h3IUtGTn",
+    "timezone": "Asia/Muscat",
+    "executionTimeout": 900
+  },
+  "versionId": "cc8d6da7-83d1-4d46-9359-9dbd40ee7524",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f8dff506f39203aff5a692e2cd7a8a3c59ecdf9249101c2918e876da4cb7910"
+  },
+  "id": "OS5jY7uswD4x47Fc",
+  "tags": []
+}
