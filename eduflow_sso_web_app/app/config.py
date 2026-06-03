@@ -11,7 +11,7 @@ class Settings:
 
     # App
     APP_BASE_URL: str = os.getenv(
-        "APP_BASE_URL", "https://mentormindweb.thedevrelay.com"
+        "APP_BASE_URL", "https://eduflow.thedevrelay.com"
     )
     SESSION_SECRET_KEY: str = os.environ["SESSION_SECRET_KEY"]
 
