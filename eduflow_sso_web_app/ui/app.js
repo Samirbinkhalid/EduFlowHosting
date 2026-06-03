@@ -12,8 +12,8 @@
 // ------------------------------------------------------------------ //
 // Constants                                                           //
 // ------------------------------------------------------------------ //
-const HEALTH_URL     = 'https://eduflown8n.thedevrelay.com/webhook/isactive';
-const USERS_URL      = 'https://eduflown8n.thedevrelay.com/webhook/eduflowusers';
+const HEALTH_URL     = 'https://echoautomation.theworkpc.com/webhook/isactive';
+const USERS_URL      = 'https://echoautomation.theworkpc.com/webhook/eduflowusers';
 const CHECK_INTERVAL = 15_000;   // health-check poll every 15 s
 const FETCH_TIMEOUT  = 10_000;   // treat any request as failed after 10 s
 

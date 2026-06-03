@@ -37,7 +37,7 @@ class Settings:
     # Called as GET <USERS_URL>?email=<email>  →  200 = allowed, 404 = not activated.
     USERS_URL: str = os.getenv(
         "USERS_URL",
-        "https://eduflown8n.thedevrelay.com/webhook/eduflowusers",
+        "https://echoautomation.theworkpc.com/webhook/eduflowusers",
     )
 
     # ── Storage paths ──────────────────────────────────────────────────────
