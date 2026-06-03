@@ -6,203 +6,122 @@
   <title>EduFlow AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: "class",
-      theme: { extend: { fontFamily: { display: ["Outfit","sans-serif"], body: ['"Plus Jakarta Sans"',"sans-serif"] } } }
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Outfit", "sans-serif"],
+            body: ['"Plus Jakarta Sans"', "sans-serif"]
+          }
+        }
+      }
     };
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link href="/ui/app.css?v=5" rel="stylesheet" />
-
-  <!-- Three.js + Vanta WAVES -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
-
-  <!-- Lordicon animated icons -->
-  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <link href="/ui/app.css?v=3" rel="stylesheet" />
 </head>
-<body class="app-root">
+<body class="min-h-screen bg-slate-50 font-body text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+  <div class="pointer-events-none fixed inset-0 -z-20 bg-slate-50 dark:bg-slate-950"></div>
+  <div class="pointer-events-none fixed inset-0 -z-10 opacity-25 dark:opacity-20" style="background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 40px 40px;"></div>
+  <div class="pointer-events-none fixed -left-48 top-10 -z-10 h-[34rem] w-[34rem] rounded-full bg-violet-400/20 blur-3xl dark:bg-violet-600/25"></div>
+  <div class="pointer-events-none fixed -right-52 bottom-4 -z-10 h-[36rem] w-[36rem] rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/22"></div>
+  <div class="pointer-events-none fixed left-1/2 top-1/2 -z-10 h-[48rem] w-[48rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-700/15"></div>
 
-  <!-- ─── LAYER −1 : Vanta WAVES ──────────────────────────── -->
-  <div id="vantaBg"></div>
-
-  <!-- ─── LAYER 0 : Star field canvas ─────────────────────── -->
-  <canvas id="starfield"></canvas>
-
-  <!-- ─── LAYER 0 : Aurora blobs ──────────────────────────── -->
-  <div class="aurora a1"></div>
-  <div class="aurora a2"></div>
-  <div class="aurora a3"></div>
-  <div class="aurora a4"></div>
-  <div class="aurora a5"></div>
-
-  <!-- ─── Floating glowing particles ─────────────────────── -->
-  <span class="dot d1"></span>
-  <span class="dot d2"></span>
-  <span class="dot d3"></span>
-  <span class="dot d4"></span>
-  <span class="dot d5"></span>
-  <span class="dot d6"></span>
-  <span class="dot d7"></span>
-
-  <!-- ─── Noise grain overlay ─────────────────────────────── -->
-  <div class="noise-overlay"></div>
-
-  <!-- ═══════════════════════════════════════════════════════
-       TOP AUTH BAR
-       ═══════════════════════════════════════════════════════ -->
-  <header class="top-bar">
-    <button id="themeToggle" class="icon-btn" aria-label="Toggle dark mode">
+  <!-- Fixed top-right settings bar, vertical on sm, row on md+ -->
+  <div class="fixed top-4 right-4 z-50 flex flex-col md:flex-row gap-2 items-end md:items-center">
+    <button id="themeToggle" class="transform-gpu rounded-full border border-slate-300 bg-white/90 px-3 py-2 text-slate-700 transition-all duration-300 ease-out hover:scale-105 dark:border-slate-700 dark:bg-slate-800/85 dark:text-slate-100" aria-label="Toggle dark mode">
       <i id="themeIcon" class="fa-solid fa-moon"></i>
     </button>
-    <div id="authSettings" class="auth-zone">
-      <button id="googleSSOBtn" class="google-btn">
-        <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" style="flex-shrink:0">
-          <path d="M17.64 9.2045c0-.638-.0572-1.2523-.1636-1.837h-7.478v3.481h4.2746a3.65 3.65 0 01-1.595 2.394v1.975h2.584c1.5101-1.3913 2.378-3.4398 2.378-6.013z" fill="#4285F4"/>
-          <path d="M9.9984 17c2.1592 0 3.976-.716 5.3017-1.951l-2.584-1.975c-.718.482-1.636.77-2.7177.77-2.0887 0-3.8587-1.4107-4.4948-3.302l-2.6341 2.032C2.8698 15.208 6.1092 17 9.9984 17z" fill="#34A853"/>
-          <path d="M5.5036 10.5427c-.1593-.482-.2503-.998-.2503-1.542 0-.544.091-1.06.2503-1.542V5.428H2.8695A8.007 8.007 0 002 9c0 1.246.3003 2.428.8696 3.545l2.634-2.002z" fill="#FBBC05"/>
-          <path d="M9.9984 6.2054c1.1794 0 2.2368.4064 3.069 1.201l2.302-1.793C14.0267 2.355 12.1512 1.45 9.9984 1.45 6.1092 1.45 2.8698 3.792 1.4355 6.875l2.634 2.031C4.7036 7.616 7.0176 6.2054 9.9984 6.2054z" fill="#EA4335"/>
-        </svg>
-        <span>Sign In with Google</span>
+    <div id="authSettings" class="flex flex-col items-end md:flex-row md:items-center gap-2">
+      <button id="googleSSOBtn" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white/70 px-4 py-2.5 font-semibold text-slate-800 transition hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+        <span class="google-logo" aria-hidden="true" style="display:flex;align-items:center;margin-right:0.5em">
+  <svg width="18" height="18" viewBox="0 0 18 18">
+    <g>
+      <path d="M17.64 9.2045c0-.638-.0572-1.2523-.1636-1.837h-7.478v3.481h4.2746a3.65 3.65 0 01-1.595 2.394v1.975h2.584c1.5101-1.3913 2.378-3.4398 2.378-6.013z" fill="#4285F4"/>
+      <path d="M9.9984 17c2.1592 0 3.976-0.716 5.3017-1.951l-2.584-1.975c-0.718 0.482-1.636 0.770-2.7177 0.770-2.0887 0-3.8587-1.4107-4.4948-3.302l-2.6341 2.032c1.3316 2.634 4.149 4.426 7.1299 4.426z" fill="#34A853"/>
+      <path d="M5.5036 10.5427c-0.1593-0.482-0.2503-0.998-0.2503-1.542 0-0.544 0.09099-1.06 0.2503-1.542v-2.031h-2.6341A8.007 8.007 0 002 9c0 1.246 0.3003 2.428 0.8696 3.545l2.634-2.032z" fill="#FBBC05"/>
+      <path d="M9.9984 6.2054c1.1794 0 2.2368 0.4064 3.069-1.201l2.302-1.793C14.0267 2.355 12.1512 1.45 9.9984 1.45 7.0176 1.45 4.2002 3.241 2.8686 5.875l2.634 2.031C6.1397 7.6161 7.9097 6.2054 9.9984 6.2054z" fill="#EA4335"/>
+    </g>
+  </svg>
+</span>
+<span>Sign In</span>
       </button>
-      <div id="welcomeMsg" class="welcome-row hidden">
-        <span class="greet-text">Hey, <strong id="teacherName">Teacher</strong></span>
-        <a id="monitorLink" href="/dbstatus" class="monitor-btn hidden" title="DB Monitor — live job status">
-          <i class="hourglass-icon fa-solid fa-hourglass-half"></i>
-        </a>
-        <button id="logoutBtn" class="logout-btn">Logout</button>
+      <div id="welcomeMsg" class="hidden flex-col md:flex-row md:items-center gap-2">
+        <span class="font-bold">Welcome, <span id="teacherName">Teacher</span>!</span>
+        <button id="logoutBtn" class="mt-2 md:mt-0 rounded px-4 py-2 border font-semibold text-violet-700 border-violet-300 bg-violet-50 hover:bg-violet-100 dark:text-violet-200 dark:border-violet-500 dark:bg-slate-800 dark:hover:bg-slate-900">Logout</button>
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       MAIN STAGE — 2-column grid
-       ═══════════════════════════════════════════════════════ -->
-  <main class="stage">
-
-    <!-- ═══ LEFT — Hero branding ═══ -->
-    <section class="hero">
-
-      <!-- Brand lockup -->
-      <div class="brand-lockup">
-        <div class="brand-icon-box">
-          <lord-icon
-            src="https://cdn.lordicon.com/wxnxiano.json"
-            trigger="loop"
-            colors="primary:#22d3ee,secondary:#8b5cf6"
-            stroke="bold"
-            style="width:52px;height:52px">
-          </lord-icon>
+  <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-10 pt-16 sm:px-6 lg:flex-row lg:items-center lg:gap-16 lg:px-8">
+    <section class="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
+      <div class="mb-8 flex items-center gap-3">
+        <svg viewBox="0 0 64 64" class="h-10 w-10" aria-hidden="true">
+          <path class="fill-violet-700 dark:fill-violet-500" d="M49 7C34 7 19 18 19 35c0 13 10 22 21 22 13 0 23-10 23-24 0-14-6-26-14-26Zm-2 45c-10 0-17-7-17-17 0-12 10-21 21-21 5 0 8 3 8 8 0 11-8 30-12 30Z"/>
+          <path class="fill-emerald-600 dark:fill-emerald-400" d="M29 17c-6 7-8 15-6 23 2 7 7 13 15 16 3-8 2-16-1-23-2-7-5-12-8-16Zm10 8c5 6 7 12 6 18-1 5-4 9-8 12-2-5-2-11 0-17 1-5 2-9 2-13Z"/>
+        </svg>
+        <span class="text-xl font-semibold tracking-wide text-slate-900 dark:text-slate-100">EduFlow AI</span>
+      </div>
+      <span class="font-display inline-flex items-center rounded-full border border-violet-300/60 bg-violet-100/80 px-4 py-2 text-xs font-medium tracking-tight text-violet-900 dark:border-violet-300/20 dark:bg-violet-500/10 dark:text-violet-200">
+        ✨ The AI Agentic Learning Suite.
+      </span>
+      <h1 class="font-display mt-6 leading-tight tracking-tight">
+        <span class="headline-top-glow block text-5xl font-extrabold text-slate-900 dark:text-white sm:text-6xl lg:text-7xl">
+          Record & Upload Lectures
+        </span>
+        <span class="block pb-2 text-3xl font-extrabold leading-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-700 to-emerald-600 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] dark:from-violet-400 dark:to-emerald-400 dark:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)] sm:text-4xl lg:text-5xl">
+          for Effortless Grading & Feedback
+        </span>
+      </h1>
+      <p class="font-body mt-6 max-w-xl text-base leading-relaxed text-slate-700 dark:text-slate-300 sm:text-lg">
+        EduFlow AI brings teacher-centric tools to the forefront—analyze, annotate, and automate assessments for any recorded lesson or seminar. Secure SSO-integrated uploads support a seamless, modern workflow.
+      </p>
+      <blockquote class="mt-6 max-w-xl border-l-4 border-violet-500 pl-4 italic leading-relaxed text-slate-800 shadow-[0_0_15px_rgba(139,92,246,0.5)] dark:text-slate-200">
+        "Built for educators. Crafted for scale."
+      </blockquote>
+    </section>
+    <section class="w-full lg:w-1/2 mt-16 lg:mt-0 flex justify-center lg:justify-end">
+      <div class="upload-panel max-w-md w-full">
+        <div class="drop-zone" id="dropZone">
+          <svg class="drop-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6"  y="8"  width="68" height="46" rx="6" stroke="#2499ee" stroke-width="3.5" fill="none"/>
+            <rect x="13" y="15" width="54" height="32" rx="3" stroke="#2499ee" stroke-width="2"   fill="none" opacity=".35"/>
+            <line x1="40" y1="54" x2="40" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="26" y1="66" x2="54" y2="66" stroke="#2499ee" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="40" y1="20" x2="40" y2="42" stroke="#e87722" stroke-width="3"   stroke-linecap="round"/>
+            <polyline points="30,33 40,44 50,33" stroke="#e87722" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <div class="drop-label">Drop Your Recording Here</div>
+          <div class="drop-sub">Drop here &middot; or click to upload &middot; MP4 / M4A</div>
         </div>
-        <div class="brand-text-group">
-          <span class="brand-name">
-            <span class="b-edu">Edu</span><span class="b-flow">Flow</span>
-          </span>
-          <span class="brand-ai-tag">AI</span>
+        <button class="upload-btn" id="uploadBtn">
+          <svg class="upload-btn-icon" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="20" width="156" height="108" rx="12" ry="12" stroke="#2499ee" stroke-width="8" fill="none"/>
+            <line x1="90" y1="128" x2="90"  y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
+            <line x1="60" y1="150" x2="120" y2="150" stroke="#2499ee" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="90" cy="74" r="26" stroke="#e87722" stroke-width="7" fill="none"/>
+            <circle cx="90" cy="74" r="11" fill="#e87722"/>
+          </svg>
+          <span id="uploadBtnLabel">Upload Recording</span>
+        </button>
+        <input type="file" id="fileInput" accept=".mp4,.m4a,video/mp4,audio/mp4,audio/x-m4a" style="display:none"/>
+        <div class="upload-feedback" id="uploadFeedback" style="display:none">
+          <div class="upload-error"   id="uploadError"></div>
+          <div class="upload-progress-wrap" id="uploadProgressWrap" style="display:none">
+            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+          </div>
+          <div class="upload-status"  id="uploadStatus"></div>
         </div>
       </div>
-
-      <!-- Tagline -->
-      <p class="tagline">
-        <span class="tg-gem">◆</span>
-        The AI Agentic Learning Suite
-      </p>
-
-      <!-- Main headline -->
-      <h1 class="headline">
-        <span class="hl-line hl-white">Record &amp; Upload</span>
-        <span class="hl-line hl-gradient">Lectures.</span>
-      </h1>
-
-      <!-- Description -->
-      <p class="hero-desc">
-        Teacher-centric AI that analyzes, annotates, and automates
-        assessments for every recorded lesson. Secure SSO-integrated
-        uploads. Zero friction.
-      </p>
-
     </section>
-
-    <!-- ═══ RIGHT — Upload card ═══ -->
-    <section class="upload-section">
-      <div class="card-wrap">
-        <!-- Spinning gradient border element -->
-        <div class="spin-border" aria-hidden="true"></div>
-
-        <!-- Glass upload panel -->
-        <div class="upload-glass">
-
-          <div class="card-header">
-            <lord-icon
-              src="https://cdn.lordicon.com/puvaffet.json"
-              trigger="hover"
-              colors="primary:#22d3ee,secondary:#8b5cf6"
-              stroke="bold"
-              style="width:26px;height:26px">
-            </lord-icon>
-            <span>Upload a Recording</span>
-          </div>
-
-          <div class="drop-zone" id="dropZone">
-            <!-- Animated scan line -->
-            <div class="scan-line" aria-hidden="true"></div>
-            <lord-icon
-              src="https://cdn.lordicon.com/puvaffet.json"
-              trigger="hover"
-              colors="primary:#22d3ee,secondary:#8b5cf6"
-              stroke="bold"
-              style="width:68px;height:68px">
-            </lord-icon>
-            <div class="drop-label">Drop your file here</div>
-            <div class="drop-sub">MP4 or M4A &nbsp;·&nbsp; up to 500 MB</div>
-          </div>
-
-          <button class="upload-btn" id="uploadBtn">
-            <lord-icon
-              src="https://cdn.lordicon.com/etwtznjn.json"
-              trigger="hover"
-              colors="primary:#ffffff,secondary:#fbbf24"
-              stroke="bold"
-              style="width:22px;height:22px">
-            </lord-icon>
-            <span id="uploadBtnLabel">Upload Recording</span>
-          </button>
-
-          <input type="file" id="fileInput" accept=".mp4,.m4a,video/mp4,audio/mp4,audio/x-m4a" style="display:none"/>
-
-          <div class="upload-feedback" id="uploadFeedback" style="display:none">
-            <div class="upload-error"   id="uploadError"></div>
-            <div class="upload-progress-wrap" id="uploadProgressWrap" style="display:none">
-              <div class="upload-progress-bar" id="uploadProgressBar"></div>
-            </div>
-            <div class="upload-status"  id="uploadStatus"></div>
-          </div>
-
-        </div><!-- /.upload-glass -->
-      </div><!-- /.card-wrap -->
-    </section>
-
   </main>
-
-  <!-- ═══════════════════════════════════════════════════════
-       FOOTER
-       ═══════════════════════════════════════════════════════ -->
-  <footer class="site-footer">
-    <span class="status-dot" id="statusDot"></span>
-    <span id="sysStatus">All Systems Online</span>
-    <span class="copy-text">© 2026 EduFlow AI</span>
+  <footer class="pb-4 text-center">
+    <p class="text-xs tracking-wide text-slate-500">© 2026 EduFlow AI · <span id="sysStatus">All Systems Online</span></p>
   </footer>
-
-  <!-- ── Stubs for app.js (prevents null-reference errors) ── -->
-  <span id="authBtn" style="display:none"></span>
-  <span id="authSub"  style="display:none"></span>
-
-  <!-- ═══════════════════════════════════════════════════════
-       EXISTING SCRIPTS — PRESERVED VERBATIM
-       ═══════════════════════════════════════════════════════ -->
   <script src="/ui/tus.min.js"></script>
   <script src="/ui/app.js?v=3"></script>
   <script>
@@ -257,168 +176,5 @@
     // Check on page load
     checkAuth();
   </script>
-
-  <!-- Monitor link: show alongside #welcomeMsg without touching existing scripts -->
-  <script>
-    (function syncMonitorLink() {
-      const monitorLink = document.getElementById('monitorLink');
-      const welcomeMsg  = document.getElementById('welcomeMsg');
-      const sync = () => monitorLink.classList.toggle('hidden', welcomeMsg.classList.contains('hidden'));
-      sync();
-      new MutationObserver(sync).observe(welcomeMsg, { attributes: true, attributeFilter: ['class'] });
-    })();
-  </script>
-
-  <!-- Vanta WAVES background -->
-  <script>
-    VANTA.WAVES({
-      el: "#vantaBg",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x040d1f,
-      waveHeight: 20.00,
-      waveSpeed: 0.40,
-      zoom: 0.80,
-      shininess: 50.00
-    });
-  </script>
-
-  <!-- ─── STAR FIELD ────────────────────────────────────────
-       4-tier canvas star field at 60 fps.
-       · IDLE   (130) — barely-there static flicker
-       · TWINKLE(160) — classic independent twinkling
-       · SHINE  ( 35) — rare sharp flares with cross-spike
-       · DRIFT  ( 75) — slowly drifting stars that wrap edges
-       ──────────────────────────────────────────────────────── -->
-  <script>
-    (function initStarField() {
-      const canvas = document.getElementById('starfield');
-      const ctx    = canvas.getContext('2d');
-      let W, H, stars = [];
-      let prevTs = 0;
-
-      const IDLE    = 0, TWINKLE = 1, SHINE = 2, DRIFT = 3;
-      const COUNTS  = [130, 160, 35, 75];   // per tier
-
-      function rnd(lo, hi) { return lo + Math.random() * (hi - lo); }
-
-      /* ── Resize ─────────────────────────────────────────────── */
-      function resize() {
-        W = canvas.width  = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-      }
-
-      /* ── Build one star ─────────────────────────────────────── */
-      function makeStar(type) {
-        const angle = Math.random() * Math.PI * 2;
-        const spd   = type === DRIFT ? rnd(20, 60) : 0;
-        return {
-          type,
-          x:     Math.random() * W,
-          y:     Math.random() * H,
-          r:  [rnd(.12,.50), rnd(.30,1.40), rnd(.90,2.20), rnd(.35,1.30)][type],
-          base:  [rnd(.03,.09), rnd(.18,.52), rnd(.04,.10), rnd(.22,.52)][type],
-          amp:   [rnd(.02,.06), rnd(.15,.36), rnd(.76,.92), rnd(.12,.28)][type],
-          freq:  [rnd(.05,.22), rnd(.35,1.60), rnd(.18,.55), rnd(.28,.95)][type],
-          phase: Math.random() * Math.PI * 2,
-          /* ~18% blue-white tint, rest pure white */
-          rgb:   Math.random() < 0.18 ? '185,215,255' : '255,255,255',
-          vx: spd * Math.cos(angle),
-          vy: spd * Math.sin(angle),
-        };
-      }
-
-      /* ── Seed all tiers ─────────────────────────────────────── */
-      function seed() {
-        stars = [];
-        COUNTS.forEach((n, type) => {
-          for (let i = 0; i < n; i++) stars.push(makeStar(type));
-        });
-      }
-
-      /* ── Draw loop ──────────────────────────────────────────── */
-      function draw(ts) {
-        const dt = Math.min((ts - prevTs) * 0.001, 0.05);
-        prevTs   = ts;
-        const t  = ts * 0.001;
-
-        ctx.clearRect(0, 0, W, H);
-
-        for (const s of stars) {
-
-          /* Move drift stars */
-          if (s.type === DRIFT) {
-            s.x += s.vx * dt;
-            s.y += s.vy * dt;
-            if (s.x < -4) s.x = W + 4;
-            else if (s.x > W + 4) s.x = -4;
-            if (s.y < -4) s.y = H + 4;
-            else if (s.y > H + 4) s.y = -4;
-          }
-
-          /* Opacity — shine uses sin² for sharp brief flares */
-          let a;
-          if (s.type === SHINE) {
-            const raw = Math.max(0, Math.sin(s.freq * t + s.phase));
-            a = s.base + s.amp * raw * raw;
-          } else {
-            a = s.base + s.amp * Math.sin(s.freq * t + s.phase);
-          }
-          a = Math.max(0, Math.min(1, a));
-          if (a < 0.012) continue;   /* skip invisible, save draw calls */
-
-          /* Core dot */
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${s.rgb},${a.toFixed(3)})`;
-          ctx.fill();
-
-          /* Glow halo — medium/shine/drift stars only */
-          if (s.r > 0.65 && a > 0.18) {
-            const big  = s.type === SHINE && a > 0.55;
-            const gR   = s.r * (big ? 6.0 : 3.5);
-            const gA   = (a * (big ? 0.32 : 0.11)).toFixed(3);
-            const g    = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, gR);
-            g.addColorStop(0, `rgba(${s.rgb},${gA})`);
-            g.addColorStop(1, `rgba(${s.rgb},0)`);
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, gR, 0, Math.PI * 2);
-            ctx.fillStyle = g;
-            ctx.fill();
-          }
-
-          /* 4-point spike for shine stars at peak (a > 0.68) */
-          if (s.type === SHINE && a > 0.68) {
-            const frac = (a - 0.68) / 0.32;       /* 0 → 1 as a→1 */
-            const len  = s.r * 9 * frac;
-            const sa   = (a * 0.45).toFixed(3);
-            ctx.strokeStyle = `rgba(${s.rgb},${sa})`;
-            ctx.lineWidth   = Math.max(0.4, s.r * 0.35);
-            ctx.lineCap     = 'round';
-            ctx.beginPath();
-            ctx.moveTo(s.x - len, s.y); ctx.lineTo(s.x + len, s.y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(s.x, s.y - len); ctx.lineTo(s.x, s.y + len);
-            ctx.stroke();
-          }
-        }
-
-        requestAnimationFrame(draw);
-      }
-
-      resize();
-      seed();
-      requestAnimationFrame(draw);
-      window.addEventListener('resize', () => { resize(); seed(); });
-    })();
-  </script>
-  </script>
-
 </body>
 </html>

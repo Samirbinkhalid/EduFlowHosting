@@ -20,7 +20,7 @@ from app.config import settings
 
 # Module-level client — instantiated once per process.
 # The scheduler threads share this instance; the SDK is thread-safe.
-_client = ElevenLabs(api_key=settings.ELEVENLABS_API_KEY, timeout=600)
+_client = ElevenLabs(api_key=settings.ELEVENLABS_API_KEY)
 
 
 def transcribe_audio(file_path: Path) -> str:
