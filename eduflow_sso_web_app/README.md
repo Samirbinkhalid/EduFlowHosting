@@ -1,8 +1,8 @@
-# MentorMind — Agent Context
+# EduFlow — Agent Context
 
 ## Project Overview
 
-MentorMind is a web application that allows authenticated users to upload screen/session recordings.
+EduFlow is a web application that allows authenticated users to upload screen/session recordings.
 The system extracts audio from the recording, transcribes it via ElevenLabs, and persists the
 transcript along with file metadata to PostgreSQL.
 
@@ -32,7 +32,7 @@ permission-gated per user.
 ## Repository Layout
 
 ```
-codeline_sso_web_app/
+eduflow_sso_web_app/
 ├── app/
 │   ├── main.py               # FastAPI app factory, middleware, root routes
 │   ├── config.py             # Settings loaded from environment variables
@@ -44,7 +44,7 @@ codeline_sso_web_app/
 ├── ui/
 │   └── index.html            # Home page (post-login); upload UI (drag-drop + button)
 ├── .env.example              # Required environment variable template
-├── docker-compose.yml        # Single-service compose (image: codelineatyab/mentormindweb-app)
+├── docker-compose.yml        # Single-service compose (image: codelineatyab/eduflowweb-app)
 ├── Dockerfile
 ├── pyproject.toml
 └── requirements.txt
@@ -170,7 +170,7 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
 # App
-APP_BASE_URL=https://mentormindweb.thedevrelay.com
+APP_BASE_URL=https://eduflow.thedevrelay.com
 SESSION_SECRET_KEY=                  # python -c "import secrets; print(secrets.token_hex(32))"
 POST_LOGIN_REDIRECT=/
 POST_LOGOUT_REDIRECT=/
