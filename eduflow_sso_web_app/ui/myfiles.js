@@ -65,12 +65,8 @@ function processedBadge(isProcessed) {
 function truncateCell(text, title) {
   const safe = escHtml(text);
   if (!safe) return '<span class="empty-cell">—</span>';
-  if (safe.length <= TRUNC_LEN) return safe;
-
-  const truncated = safe.slice(0, TRUNC_LEN) + '…';
-  // Use a data attribute to store the full escaped text; the click handler
-  // reads it and opens the popup with markdown rendering.
-  return `<span class="truncated-cell" data-full-text="${safe.replace(/"/g, '&quot;')}" data-title="${escHtml(title)}">${truncated}</span>`;
+  const display = safe.length <= TRUNC_LEN ? safe : safe.slice(0, TRUNC_LEN) + '…';
+  return `<span class="truncated-cell" data-full-text="${safe.replace(/"/g, '&quot;')}" data-title="${escHtml(title)}">${display}</span>`;
 }
 
 // ------------------------------------------------------------------ //
@@ -107,12 +103,19 @@ let popupEl = null;
 function openPopup(title, rawText) {
   closePopup();
 
-  // Render markdown via marked.js
+  // Detect format: JSON → pretty-print, otherwise markdown → rendered HTML
   let html;
   try {
-    html = marked.parse(rawText);
+    const parsed = JSON.parse(rawText);
+    html = '<pre style="font-family:\'Space Grotesk\',monospace;line-height:1.6;white-space:pre-wrap">'
+         + escHtml(JSON.stringify(parsed, null, 2))
+         + '</pre>';
   } catch (_) {
-    html = `<pre>${escHtml(rawText)}</pre>`;
+    try {
+      html = marked.parse(rawText);
+    } catch (__) {
+      html = `<pre>${escHtml(rawText)}</pre>`;
+    }
   }
 
   popupEl = document.createElement('div');
