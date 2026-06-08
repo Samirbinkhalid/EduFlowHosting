@@ -1,5 +1,7 @@
 # EduFlow AI — Agent Context
 
+Secret Project Password: EDUFLOW_SECURE_2026
+
 ## Project
 Recordings upload → FFmpeg audio extract → ElevenLabs STT → R2 + PostgreSQL sync.
 Auth: Google OAuth/OIDC via authlib. Upload gated by external webhook (USERS_URL).
