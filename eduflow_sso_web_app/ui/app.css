@@ -321,6 +321,48 @@ html, body {
   50%     { box-shadow: 0 0 0 4px rgba(251,191,36,0.12); }
 }
 
+/* ── My Files button ──────────────────────────────────────────── */
+.myfiles-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(139,92,246,0.22);
+  background: rgba(139,92,246,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.22s;
+  animation: myfilesPing 2.8s ease-in-out infinite 0.7s;
+}
+.myfiles-btn:hover {
+  background: rgba(139,92,246,0.14);
+  border-color: var(--violet);
+  box-shadow: 0 0 16px rgba(139,92,246,0.28);
+}
+.myfiles-btn.hidden { display: none !important; }
+@keyframes myfilesPing {
+  0%,100% { box-shadow: 0 0 0 0 rgba(139,92,246,0); }
+  50%     { box-shadow: 0 0 0 4px rgba(139,92,246,0.12); }
+}
+
+/* ── Animated paper icon (writing effect) ─────────────────────── */
+.paper-icon {
+  font-size: 12px;
+  color: var(--violet);
+  text-shadow: 0 0 8px rgba(139,92,246,0.55);
+  display: inline-block;
+  transform-origin: center bottom;
+  animation: paperWrite 3s ease-in-out infinite;
+}
+@keyframes paperWrite {
+  0%   { transform: rotate(0deg)   translateY(0);     filter: drop-shadow(0 0 4px rgba(139,92,246,.40)); }
+  15%  { transform: rotate(-6deg)  translateY(-2px);  filter: drop-shadow(0 0 8px rgba(139,92,246,.65)); }
+  30%  { transform: rotate(4deg)   translateY(-3px);  filter: drop-shadow(0 0 10px rgba(139,92,246,.80)); }
+  45%  { transform: rotate(-3deg)  translateY(-1px);  filter: drop-shadow(0 0 7px rgba(139,92,246,.60)); }
+  60%  { transform: rotate(0deg)   translateY(0);     filter: drop-shadow(0 0 4px rgba(139,92,246,.40)); }
+  100% { transform: rotate(0deg)   translateY(0);     filter: drop-shadow(0 0 4px rgba(139,92,246,.40)); }
+}
+
 /* ── Logout button ───────────────────────────────────────────── */
 .logout-btn {
   padding: 5px 14px;

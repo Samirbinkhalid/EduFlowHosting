@@ -11,6 +11,7 @@ from app.config import settings
 from app.routers.auth import router as auth_router
 from app.routers.upload import router as upload_router
 from app.routers.monitor import router as monitor_router
+from app.routers.user_files import router as user_files_router
 from app.auth.dependencies import get_current_user
 from app import database
 from app import scheduler
@@ -82,6 +83,7 @@ app.mount("/ui", StaticFiles(directory=UI_DIR), name="ui")
 app.include_router(auth_router)
 app.include_router(upload_router, prefix="/upload", tags=["upload"])
 app.include_router(monitor_router, tags=["monitor"])
+app.include_router(user_files_router, tags=["user-files"])
 
 
 # --------------------------------------------------------------------------- #

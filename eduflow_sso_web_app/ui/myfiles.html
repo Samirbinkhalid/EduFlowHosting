@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduFlow AI · My Files</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js + Vanta WAVES -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- marked.js for markdown rendering in popup -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* ── Reset ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens (mirrors monitor.html) ───────────────────────────── */
+    :root {
+      --cyan:    #22d3ee;
+      --cyan-d:  #06b6d4;
+      --violet:  #8b5cf6;
+      --violet-d: #6d28d9;
+      --amber:   #fbbf24;
+      --orange:  #f97316;
+      --green:   #22c55e;
+      --red:     #f87171;
+      --bg:      #030b18;
+      --glass:   rgba(5, 13, 28, 0.82);
+      --border:  rgba(34,211,238,0.09);
+      --text:    rgba(203,213,225,0.88);
+      --text-d:  rgba(100,130,160,0.55);
+    }
+
+    /* ── Root — scrollable page ──────────────────────────────────── */
+    html {
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* ── Custom scrollbar ────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.22); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.42); }
+
+    /* ══════════════════════════════════════════════════════════════
+       BACKGROUND — fixed behind scrolling content
+       ══════════════════════════════════════════════════════════════ */
+    #vantaBg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
+
+    .aurora {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(110px);
+      pointer-events: none;
+      z-index: 0;
+      will-change: transform, opacity;
+    }
+    .a1 {
+      width: 50vw; height: 50vw;
+      top: -14vw; left: -10vw;
+      background: radial-gradient(circle, rgba(34,211,238,0.26) 0%, rgba(59,130,246,0.12) 55%, transparent 80%);
+      animation: ma1 22s ease-in-out infinite;
+    }
+    .a2 {
+      width: 44vw; height: 44vw;
+      bottom: -14vw; right: -8vw;
+      background: radial-gradient(circle, rgba(139,92,246,0.28) 0%, transparent 75%);
+      animation: ma2 26s ease-in-out infinite;
+    }
+    .a3 {
+      width: 36vw; height: 36vw;
+      top: 40%; left: 55%;
+      background: radial-gradient(circle, rgba(251,191,36,0.10) 0%, transparent 70%);
+      animation: ma3 18s ease-in-out infinite;
+    }
+
+    @keyframes ma1 { 0%,100%{transform:translate(0,0) scale(1); opacity:.75} 50%{transform:translate(8vw,-4vw) scale(1.15); opacity:.95} }
+    @keyframes ma2 { 0%,100%{transform:translate(0,0) scale(1); opacity:.7}  50%{transform:translate(-7vw,5vw) scale(1.18); opacity:.9}  }
+    @keyframes ma3 { 0%,100%{transform:translate(-50%,-50%) scale(.9); opacity:.38} 50%{transform:translate(-50%,-50%) scale(1.3); opacity:.62} }
+
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       PAGE WRAPPER
+       ══════════════════════════════════════════════════════════════ */
+    .page {
+      position: relative;
+      z-index: 2;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 40px) clamp(16px, 3vw, 48px) clamp(40px, 5vw, 64px);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       PAGE HEADER
+       ══════════════════════════════════════════════════════════════ */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding-bottom: clamp(18px, 3vw, 30px);
+      margin-bottom: clamp(24px, 3.5vw, 40px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-wordmark {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .b-edu {
+      color: #f0f9ff;
+      text-shadow: 0 0 20px rgba(240,249,255,0.25), 0 0 40px rgba(34,211,238,0.15);
+    }
+    .b-flow {
+      background: linear-gradient(90deg, var(--cyan) 0%, var(--violet) 60%, var(--cyan) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: brandShimmer 3.5s linear infinite;
+    }
+    @keyframes brandShimmer {
+      from { background-position: 0% center; }
+      to   { background-position: 200% center; }
+    }
+
+    .mf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(34,211,238,0.28);
+      background: rgba(34,211,238,0.07);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      text-shadow: 0 0 10px rgba(34,211,238,0.35);
+      animation: badgePulse 3s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34,211,238,0); }
+      50%     { box-shadow: 0 0 12px 2px rgba(34,211,238,0.12); }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .user-info {
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      color: var(--text-d);
+    }
+    .user-info strong {
+      color: var(--cyan);
+      font-weight: 600;
+      text-shadow: 0 0 8px rgba(34,211,238,0.35);
+    }
+
+    .home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(34,211,238,0.18);
+      background: rgba(34,211,238,0.06);
+      color: rgba(186,230,253,0.75);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: all 0.22s;
+    }
+    .home-btn:hover {
+      background: rgba(34,211,238,0.13);
+      border-color: rgba(34,211,238,0.38);
+      color: var(--cyan);
+      box-shadow: 0 0 14px rgba(34,211,238,0.15);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DATA SECTION
+       ══════════════════════════════════════════════════════════════ */
+    .data-section {
+      margin-bottom: clamp(28px, 4vw, 48px);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: clamp(14px, 2.5vw, 22px);
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(0.82rem, 1.5vw, 1rem);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(34,211,238,0.65);
+    }
+
+    /* ── Refresh bar ─────────────────────────────────────────────── */
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.70rem;
+      letter-spacing: 0.06em;
+      color: var(--text-d);
+    }
+
+    .refresh-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 7px var(--green);
+      flex-shrink: 0;
+      animation: dotBlink 1.6s ease-in-out infinite;
+    }
+    @keyframes dotBlink {
+      0%,100% { opacity: 1; }
+      50%     { opacity: 0.2; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       TABLE GLASS PANEL
+       ══════════════════════════════════════════════════════════════ */
+    .table-glass {
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      overflow: hidden;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    /* Horizontal scroll for narrow screens; vertical scroll capped at ~5 rows */
+    .table-outer {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 308px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(0.68rem, 1.1vw, 0.80rem);
+      min-width: 580px;
+    }
+
+    thead tr {
+      border-bottom: 1px solid rgba(34,211,238,0.14);
+    }
+
+    /* Sticky thead */
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(5, 13, 28, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(0.56rem, 0.9vw, 0.66rem);
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(34,211,238,0.60);
+      padding: clamp(12px, 1.8vw, 16px) clamp(14px, 2vw, 20px);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(34,211,238,0.06);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(34,211,238,0.04); }
+
+    td {
+      padding: clamp(10px, 1.5vw, 14px) clamp(14px, 2vw, 20px);
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    /* ── Cell type styles ────────────────────────────────────────── */
+    .td-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      color: var(--text-d);
+    }
+    .td-filename {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      white-space: nowrap;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .td-date {
+      white-space: nowrap;
+      font-size: 0.78em;
+      color: rgba(148,163,184,0.65);
+    }
+    .td-content {
+      position: relative;
+      max-width: 300px;
+    }
+
+    /* ── Truncated clickable cell ────────────────────────────────── */
+    .truncated-cell {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--cyan);
+      text-shadow: 0 0 8px rgba(34,211,238,0.25);
+      border-bottom: 1px dashed rgba(34,211,238,0.22);
+      padding-bottom: 1px;
+      transition: all 0.22s;
+      animation: cellHint 3s ease-in-out infinite;
+    }
+    .truncated-cell:hover {
+      color: #e0f2fe;
+      text-shadow: 0 0 14px rgba(34,211,238,0.55);
+      border-bottom-color: rgba(34,211,238,0.55);
+      animation: none;
+    }
+    @keyframes cellHint {
+      0%,100% { border-bottom-color: rgba(34,211,238,0.15); text-shadow: 0 0 4px rgba(34,211,238,0.15); }
+      50%     { border-bottom-color: rgba(34,211,238,0.42); text-shadow: 0 0 12px rgba(34,211,238,0.45); }
+    }
+
+    .empty-cell {
+      color: var(--text-d);
+      font-style: italic;
+    }
+
+    /* ── Status badges ───────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-processed {
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,0.35);
+      background: rgba(34,197,94,0.06);
+      text-shadow: 0 0 8px rgba(34,197,94,0.35);
+    }
+
+    .badge-pending {
+      color: var(--amber);
+      border: 1px solid rgba(251,191,36,0.35);
+      background: rgba(251,191,36,0.06);
+      text-shadow: 0 0 8px rgba(251,191,36,0.4);
+    }
+
+    /* ── State rows (loading / empty / error) ────────────────────── */
+    .state-row td {
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--text-d);
+      font-size: 0.80rem;
+      letter-spacing: 0.08em;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(34,211,238,0.15);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      color: var(--amber);
+      text-shadow: 0 0 10px rgba(251,191,36,0.3);
+    }
+
+    .retry-btn {
+      display: block;
+      margin: 10px auto 0;
+      background: none;
+      border: 1px solid rgba(251,191,36,0.30);
+      color: var(--amber);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: box-shadow 0.2s, background 0.2s;
+    }
+    .retry-btn:hover {
+      background: rgba(251,191,36,0.08);
+      box-shadow: 0 0 12px rgba(251,191,36,0.22);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SECTION DIVIDER
+       ══════════════════════════════════════════════════════════════ */
+    .section-divider {
+      height: 1px;
+      margin: clamp(28px, 4vw, 48px) 0;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(34,211,238,0.18) 15%,
+        rgba(139,92,246,0.20) 50%,
+        rgba(34,211,238,0.18) 85%,
+        transparent 100%);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       POPUP MODAL
+       ══════════════════════════════════════════════════════════════ */
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(3, 11, 24, 0.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(20px, 4vw, 60px);
+      animation: overlayIn 0.22s ease-out;
+    }
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .popup-glass {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      max-height: 80vh;
+      border-radius: 20px;
+      border: 1px solid rgba(34,211,238,0.12);
+      background: rgba(5, 13, 28, 0.94);
+      backdrop-filter: blur(36px);
+      -webkit-backdrop-filter: blur(36px);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+      display: flex;
+      flex-direction: column;
+      animation: popupIn 0.28s cubic-bezier(.22,.68,0,1.2);
+    }
+    @keyframes popupIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+
+    .popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: clamp(18px, 2.5vw, 26px) clamp(20px, 3vw, 32px);
+      border-bottom: 1px solid rgba(34,211,238,0.09);
+      flex-shrink: 0;
+    }
+
+    .popup-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(0.88rem, 1.4vw, 1.1rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--cyan);
+      text-shadow: 0 0 12px rgba(34,211,238,0.30);
+    }
+
+    .popup-close {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(34,211,238,0.18);
+      background: rgba(34,211,238,0.06);
+      color: rgba(186,230,253,0.75);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.22s;
+      flex-shrink: 0;
+    }
+    .popup-close:hover {
+      background: rgba(34,211,238,0.14);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 14px rgba(34,211,238,0.18);
+    }
+
+    .popup-body {
+      padding: clamp(18px, 2.5vw, 28px) clamp(20px, 3vw, 32px);
+      overflow-y: auto;
+      overflow-x: auto;
+      flex: 1;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(0.78rem, 1.2vw, 0.90rem);
+      line-height: 1.75;
+      color: rgba(203,213,225,0.88);
+      word-wrap: break-word;
+    }
+    .popup-body h1, .popup-body h2, .popup-body h3,
+    .popup-body h4, .popup-body h5, .popup-body h6 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--cyan);
+      margin: 0.8em 0 0.4em;
+    }
+    .popup-body h1 { font-size: 1.4em; }
+    .popup-body h2 { font-size: 1.2em; }
+    .popup-body h3 { font-size: 1.05em; }
+    .popup-body p { margin: 0.5em 0; }
+    .popup-body code {
+      background: rgba(34,211,238,0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.88em;
+    }
+    .popup-body pre {
+      background: rgba(3, 11, 24, 0.7);
+      border: 1px solid rgba(34,211,238,0.12);
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      margin: 0.8em 0;
+    }
+    .popup-body pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.82em;
+    }
+    .popup-body a {
+      color: var(--violet);
+      text-decoration: underline;
+    }
+    .popup-body ul, .popup-body ol {
+      padding-left: 1.5em;
+      margin: 0.5em 0;
+    }
+    .popup-body li { margin: 0.25em 0; }
+    .popup-body blockquote {
+      border-left: 2px solid var(--violet);
+      padding-left: 14px;
+      margin: 0.8em 0;
+      color: rgba(148,163,184,0.75);
+    }
+    .popup-body table {
+      min-width: auto;
+      margin: 0.8em 0;
+      border-collapse: collapse;
+    }
+    .popup-body th, .popup-body td {
+      padding: 6px 12px;
+      border: 1px solid rgba(34,211,238,0.12);
+    }
+    .popup-body img { max-width: 100%; border-radius: 8px; }
+
+    /* Horizontal scroll for code blocks / wide tables */
+    .has-hscroll {
+      overflow-x: auto;
+    }
+
+    /* ── PAGE FOOTER ─────────────────────────────────────────────── */
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: clamp(16px, 2vw, 24px);
+      margin-top: clamp(20px, 3vw, 36px);
+      border-top: 1px solid var(--border);
+      font-size: 0.64rem;
+      letter-spacing: 0.10em;
+      color: var(--text-d);
+    }
+
+    /* ── Responsive tweaks ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .header-right { gap: 10px; }
+      .popup-glass { max-width: 95vw; max-height: 85vh; }
+    }
+    @media (max-width: 480px) {
+      .header-brand { flex-wrap: wrap; gap: 8px; }
+      .brand-wordmark { font-size: 1.5rem; }
+      .page { padding: 16px 12px 48px; }
+      .popup-glass { max-width: 98vw; max-height: 90vh; border-radius: 14px; }
+      .popup-header { padding: 14px 18px; }
+      .popup-body { padding: 14px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Fixed background layers ──────────────────────────── -->
+  <div id="vantaBg"></div>
+  <div class="aurora a1"></div>
+  <div class="aurora a2"></div>
+  <div class="aurora a3"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- ─── Page content (scrolls over fixed bg) ─────────────── -->
+  <div class="page">
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="page-header">
+      <div class="header-brand">
+        <span class="brand-wordmark">
+          <span class="b-edu">Edu</span><span class="b-flow">Flow</span>
+        </span>
+        <span class="mf-badge">
+          <i class="fa-solid fa-file-pen"></i>
+          My Files
+        </span>
+      </div>
+      <div class="header-right">
+        <span class="user-info">
+          Signed in as <strong id="userEmail">—</strong>
+        </span>
+        <a class="home-btn" href="/">← Home</a>
+      </div>
+    </header>
+
+    <!-- ═══ UPLOADED FILES ═══ -->
+    <section class="data-section">
+      <div class="section-header">
+        <h2 class="section-title">Uploaded Files</h2>
+        <div class="refresh-bar">
+          <span class="refresh-dot" id="refreshDot"></span>
+          <span id="refreshLabel">Loading…</span>
+        </div>
+      </div>
+      <div class="table-glass">
+        <div class="table-outer">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>File Name</th>
+                <th>Is Processed</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="uploadsBody">
+              <tr class="state-row">
+                <td colspan="4"><span class="spinner"></span> Loading records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══ TRANSCRIPTIONS ═══ -->
+    <section class="data-section">
+      <div class="section-header">
+        <h2 class="section-title">Transcriptions</h2>
+      </div>
+      <div class="table-glass">
+        <div class="table-outer">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Summarized Content</th>
+                <th>Is Processed</th>
+              </tr>
+            </thead>
+            <tbody id="transcriptionsBody">
+              <tr class="state-row">
+                <td colspan="3"><span class="spinner"></span> Loading records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══ USER STORIES ═══ -->
+    <section class="data-section">
+      <div class="section-header">
+        <h2 class="section-title">User Stories</h2>
+      </div>
+      <div class="table-glass">
+        <div class="table-outer">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Processed Description</th>
+                <th>Is Processed</th>
+              </tr>
+            </thead>
+            <tbody id="storiesBody">
+              <tr class="state-row">
+                <td colspan="3"><span class="spinner"></span> Loading records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══ NOTIFICATIONS ═══ -->
+    <section class="data-section">
+      <div class="section-header">
+        <h2 class="section-title">Notifications</h2>
+      </div>
+      <div class="table-glass">
+        <div class="table-outer">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Message</th>
+                <th>Is Processed</th>
+              </tr>
+            </thead>
+            <tbody id="notificationsBody">
+              <tr class="state-row">
+                <td colspan="3"><span class="spinner"></span> Loading records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══ ACTIONS ═══ -->
+    <section class="data-section">
+      <div class="section-header">
+        <h2 class="section-title">Actions</h2>
+      </div>
+      <div class="table-glass">
+        <div class="table-outer">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Is Processed</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="actionsBody">
+              <tr class="state-row">
+                <td colspan="4"><span class="spinner"></span> Loading records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="page-footer">
+      <span>EduFlow AI &middot; My Files</span>
+      <span id="genAt">—</span>
+    </footer>
+
+  </div><!-- /.page -->
+
+  <!-- myfiles.js — data fetch and rendering -->
+  <script src="/ui/myfiles.js"></script>
+
+  <!-- Vanta WAVES init -->
+  <script>
+    VANTA.WAVES({
+      el: "#vantaBg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x040d1f,
+      waveHeight: 20.00,
+      waveSpeed: 0.40,
+      zoom: 0.80,
+      shininess: 50.00
+    });
+  </script>
+
+</body>
+</html>

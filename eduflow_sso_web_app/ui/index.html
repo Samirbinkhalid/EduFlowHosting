@@ -73,6 +73,9 @@
         <a id="monitorLink" href="/dbstatus" class="monitor-btn hidden" title="DB Monitor — live job status">
           <i class="hourglass-icon fa-solid fa-hourglass-half"></i>
         </a>
+        <a id="myfilesLink" href="/myfiles" class="myfiles-btn hidden" title="My Files">
+          <i class="paper-icon fa-solid fa-file-pen"></i>
+        </a>
         <button id="logoutBtn" class="logout-btn">Logout</button>
       </div>
     </div>
@@ -264,6 +267,17 @@
       const monitorLink = document.getElementById('monitorLink');
       const welcomeMsg  = document.getElementById('welcomeMsg');
       const sync = () => monitorLink.classList.toggle('hidden', welcomeMsg.classList.contains('hidden'));
+      sync();
+      new MutationObserver(sync).observe(welcomeMsg, { attributes: true, attributeFilter: ['class'] });
+    })();
+  </script>
+
+  <!-- My Files link: show alongside #welcomeMsg (same pattern) -->
+  <script>
+    (function syncMyfilesLink() {
+      const myfilesLink = document.getElementById('myfilesLink');
+      const welcomeMsg  = document.getElementById('welcomeMsg');
+      const sync = () => myfilesLink.classList.toggle('hidden', welcomeMsg.classList.contains('hidden'));
       sync();
       new MutationObserver(sync).observe(welcomeMsg, { attributes: true, attributeFilter: ['class'] });
     })();
